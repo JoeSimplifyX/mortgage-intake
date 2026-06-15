@@ -1,11 +1,17 @@
 import Icon from './Icons'
+import type { Loan } from '../lib'
 
 export type Page = 'pipeline' | 'briefing' | 'actions' | 'conditions' | 'freshness' | 'structuring'
 
-const MAIN_MENU: { icon: string; label: string; page?: Page; live?: boolean }[] = [
+// Portfolio-level views — not tied to any one borrower.
+const PORTFOLIO: { icon: string; label: string; page: Page; live?: boolean }[] = [
   { icon: 'list', label: 'Pipeline', page: 'pipeline' },
-  { icon: 'cpu', label: 'AI Briefing', page: 'briefing' },
   { icon: 'alert', label: 'Action List', page: 'actions', live: true },
+]
+
+// Borrower-scoped views — always relative to the selected borrower.
+const BORROWER: { icon: string; label: string; page: Page }[] = [
+  { icon: 'cpu', label: 'AI Briefing', page: 'briefing' },
   { icon: 'shield', label: 'Conditions', page: 'conditions' },
   { icon: 'clock', label: 'Doc Freshness', page: 'freshness' },
   { icon: 'dollar', label: 'Structuring', page: 'structuring' },
@@ -21,7 +27,7 @@ function NavItem({ item, active, onClick }: { item: { icon: string; label: strin
   )
 }
 
-export default function Sidebar({ page, onNavigate }: { page: Page; onNavigate: (p: Page) => void }) {
+export default function Sidebar({ page, onNavigate, loan }: { page: Page; onNavigate: (p: Page) => void; loan: Loan }) {
   return (
     <aside className="sidebar">
       <div className="brand brand-simplifyx">
@@ -30,9 +36,28 @@ export default function Sidebar({ page, onNavigate }: { page: Page; onNavigate: 
       </div>
 
       <nav className="side-nav">
-        <p className="nav-section">Loan Officer</p>
-        {MAIN_MENU.map((item) => (
-          <NavItem key={item.label} item={item} active={item.page === page} onClick={() => item.page && onNavigate(item.page)} />
+        <p className="nav-section">Portfolio</p>
+        {PORTFOLIO.map((item) => (
+          <NavItem key={item.label} item={item} active={item.page === page} onClick={() => onNavigate(item.page)} />
+        ))}
+
+        {/* Borrower context — the views below all act on this borrower */}
+        <div
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            margin: '16px 6px 8px', padding: '9px 10px',
+            background: '#f3f3fb', border: '1px solid var(--line)', borderRadius: 12,
+          }}
+        >
+          <span className="avatar" data-initials={loan.ini} />
+          <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.3, minWidth: 0 }}>
+            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-soft)' }}>Selected borrower</span>
+            <strong style={{ fontSize: 13.5, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{loan.bwr}</strong>
+            <span style={{ fontSize: 11, color: 'var(--text-soft)' }}>{loan.id}</span>
+          </span>
+        </div>
+        {BORROWER.map((item) => (
+          <NavItem key={item.label} item={item} active={item.page === page} onClick={() => onNavigate(item.page)} />
         ))}
       </nav>
 

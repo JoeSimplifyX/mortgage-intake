@@ -36,7 +36,7 @@ export default function LoanOfficer() {
 
   return (
     <div className="app">
-      <Sidebar page={page} onNavigate={setPage} />
+      <Sidebar page={page} onNavigate={setPage} loan={loan} />
 
       <div className="main">
         <Topbar />
