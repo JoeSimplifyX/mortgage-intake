@@ -3,6 +3,7 @@ import {
   C, PRODS, INITIAL_DATA, fmt, fmtK, pct, calcPI, calcEq5,
   type BorrowerData,
 } from './data'
+import ProfileMenu from '../ProfileMenu'
 
 // ============================================================
 //  SimplifyX™ Borrower Portal — pre-qualification flow.
@@ -18,9 +19,11 @@ interface ScreenProps {
 }
 
 // ── Top navigation bar ───────────────────────────────────
-function Nav() {
+function Nav({ data }: { data: BorrowerData }) {
+  const name = `${data.firstName} ${data.lastName}`.trim() || 'Your account'
+  const initials = ((data.firstName[0] || '') + (data.lastName[0] || '')).toUpperCase() || '·'
   return (
-    <div className="app-nav" style={{ background: C.black, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 48, flexShrink: 0 }}>
+    <div className="app-nav" style={{ background: C.black, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 64, flexShrink: 0 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 30, height: 30, borderRadius: 7, background: 'linear-gradient(135deg,#4646a8,#7c7cf0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>✦</div>
         <div>
@@ -28,7 +31,10 @@ function Nav() {
           <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', letterSpacing: '.08em' }}>MORTGAGE</div>
         </div>
       </div>
-      <span style={{ fontSize: 11, color: 'rgba(255,255,255,.35)' }}>📞 (800) 555-2947</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <span style={{ fontSize: 11, color: 'rgba(255,255,255,.35)' }}>📞 (800) 555-2947</span>
+        <ProfileMenu name={name} initials={initials} active="borrower" onDark />
+      </div>
     </div>
   )
 }
@@ -625,7 +631,7 @@ export default function Borrower() {
 
   return (
     <div className="app-shell">
-      <Nav />
+      <Nav data={data} />
       <div className="app-main">
         <div className="app-view">
           <div className="su" key={step}>

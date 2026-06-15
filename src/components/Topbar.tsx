@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icons'
+import ProfileMenu from '../ProfileMenu'
 
 const TABS = ['Command Center', 'Pipeline', 'Conditions', 'Closings', 'Reports']
 
@@ -15,13 +16,7 @@ export default function Topbar() {
       <div className="top-actions">
         <button className="icon-btn" aria-label="Notifications"><Icon name="bell" /><span className="dot" /></button>
         <button className="icon-btn" aria-label="Messages"><Icon name="mail" /></button>
-        <div className="profile">
-          <div className="avatar avatar-lg" data-initials="DB" />
-          <div className="profile-meta">
-            <strong>Deepak Bandi</strong>
-            <span>Senior Loan Officer</span>
-          </div>
-        </div>
+        <ProfileMenu name="Deepak Bandi" initials="DB" title="Senior Loan Officer" active="officer" />
       </div>
     </header>
   )
