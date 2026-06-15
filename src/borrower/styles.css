@@ -1,0 +1,154 @@
+/* ============================================================
+   SimplifyX™ Mortgage — Borrower Portal
+   Styling ported from demo/prototype.html (borrower flow).
+   ============================================================ */
+
+/* ── Reset & Base ─────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: #f7f7f9;
+  color: #16161a;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: #c9c9f7; border-radius: 3px; }
+
+/* ── Animations ───────────────────────────────── */
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(100px) rotate(720deg); } }
+.su { animation: slideUp .3s cubic-bezier(.2,.8,.4,1) both; }
+.pi { animation: popIn .22s cubic-bezier(.2,.8,.4,1) both; }
+
+/* ── Layout ───────────────────────────────────── */
+#root { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.app-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.app-nav { flex-shrink: 0; }
+.app-main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.app-view { flex: 1; overflow-y: auto; overflow-x: hidden; }
+
+/* ── Form controls ────────────────────────────── */
+.inp {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.5px solid #ececf0;
+  border-radius: 9px;
+  font-size: 14px;
+  color: #16161a;
+  background: #fff;
+  outline: none;
+  transition: border .15s, box-shadow .15s;
+}
+.inp:focus { border-color: #4646a8; box-shadow: 0 0 0 3px rgba(70,70,168,.12); }
+.inp::placeholder { color: #bbb; }
+.inp-money { padding-left: 24px; }
+.sel {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234646a8' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  padding-right: 30px;
+}
+.lbl { display: block; font-size: 11.5px; font-weight: 700; color: #3a3a42; margin-bottom: 5px; letter-spacing: .01em; }
+.money-wrap { position: relative; }
+.money-wrap .dollar { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; font-size: 14px; color: #6f7480; pointer-events: none; }
+
+/* ── Cards & surfaces ─────────────────────────── */
+.card { background: #fff; border-radius: 14px; border: 1px solid #ececf0; padding: 18px; box-shadow: 0 1px 5px rgba(20,20,40,.05); }
+
+/* ── Grids ────────────────────────────────────── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* ── Buttons ──────────────────────────────────── */
+.btn-primary {
+  padding: 11px 26px;
+  background: #4646a8;
+  border: none;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(70,70,168,.26);
+  transition: all .15s;
+}
+.btn-primary:hover { background: #33337a; }
+.btn-primary:disabled { background: #ececf0; color: #6f7480; box-shadow: none; cursor: not-allowed; }
+.btn-ghost {
+  padding: 10px 22px;
+  background: none;
+  border: 1.5px solid #ececf0;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #3a3a42;
+  transition: border .15s;
+}
+.btn-ghost:hover { border-color: #4646a8; }
+.btn-sm { padding: 7px 13px; font-size: 12px; border-radius: 7px; }
+
+/* ── Progress bar ─────────────────────────────── */
+.pbar-wrap { height: 3px; background: #ececf0; border-radius: 2px; margin-bottom: 22px; }
+.pbar-fill { height: 100%; background: linear-gradient(90deg,#33337a,#7c7cf0); border-radius: 2px; transition: width .4s; }
+
+/* ── Plaid button ─────────────────────────────── */
+.plaid-btn {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all .18s;
+  text-align: left;
+}
+.plaid-btn.idle { background: #fff; border: 2px solid #ececf0; }
+.plaid-btn.connected { background: #e8f7ee; border: 2px solid #1f9d55; }
+.plaid-btn.idle:hover { border-color: #4646a8; }
+
+/* ── Choice card ──────────────────────────────── */
+.choice-card {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: left;
+  margin-bottom: 8px;
+}
+.choice-card.unselected { background: #fff; border: 2px solid #ececf0; }
+.choice-card.unselected:hover { border-color: #4646a8; }
+.choice-card.selected { background: #dcdcfa; border: 2px solid #4646a8; }
+
+/* ── Product card ─────────────────────────────── */
+.prod-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all .18s;
+  border: 2.5px solid #ececf0;
+}
+.prod-card:hover { border-color: #4646a8; box-shadow: 0 4px 16px rgba(70,70,168,.12); }
+.prod-card.selected { border-color: #4646a8; box-shadow: 0 6px 22px rgba(70,70,168,.2); }
+
+/* ── Confetti pieces ──────────────────────────── */
+.confetti-piece {
+  position: fixed;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: confettiFall 1.5s ease-out forwards;
+}

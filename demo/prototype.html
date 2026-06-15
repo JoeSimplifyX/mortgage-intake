@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SimplifyX™ Mortgage Origination</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ─────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',system-ui,sans-serif;background:#F7F5FA;color:#211E1F;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#E0C6D9;border-radius:3px}
+table{border-collapse:collapse;width:100%}
+ 
+/* ── Animations ───────────────────────────────── */
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(100px) rotate(720deg)}}
+.su{animation:slideUp .3s cubic-bezier(.2,.8,.4,1) both}
+.pi{animation:popIn .22s cubic-bezier(.2,.8,.4,1) both}
+ 
+/* ── Layout ───────────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+#nav{flex-shrink:0}
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+#view{flex:1;overflow-y:auto;overflow-x:hidden}
+ 
+/* ── Form controls ────────────────────────────── */
+.inp{width:100%;padding:11px 13px;border:1.5px solid #E2D9E0;border-radius:9px;font-size:14px;color:#211E1F;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
+.inp:focus{border-color:#954892;box-shadow:0 0 0 3px rgba(149,72,146,.1)}
+.inp::placeholder{color:#bbb}
+.inp-money{padding-left:24px}
+.sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23954892' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+.lbl{display:block;font-size:11.5px;font-weight:700;color:#3D3A3B;margin-bottom:5px;letter-spacing:.01em}
+.money-wrap{position:relative}
+.money-wrap .dollar{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-weight:700;font-size:14px;color:#6B6870;pointer-events:none}
+ 
+/* ── Cards & surfaces ─────────────────────────── */
+.card{background:#fff;border-radius:13px;border:1px solid #E2D9E0;padding:18px;box-shadow:0 1px 5px rgba(33,30,31,.06)}
+ 
+/* ── Grids ────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+ 
+/* ── Toggle ───────────────────────────────────── */
+.tog{display:flex;background:#EAEAEB;border-radius:8px;padding:3px;gap:2px}
+.tog-btn{flex:1;padding:7px 10px;border:none;background:transparent;border-radius:6px;font-size:13px;font-weight:500;color:#6B6870;transition:.13s}
+.tog-btn.on{background:#fff;color:#954892;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.09)}
+ 
+/* ── Buttons ──────────────────────────────────── */
+.btn-primary{padding:11px 26px;background:#954892;border:none;border-radius:9px;font-weight:700;font-size:14px;color:#fff;box-shadow:0 4px 14px rgba(149,72,146,.28);transition:all .15s}
+.btn-primary:hover{background:#7a3a78}
+.btn-primary:disabled{background:#EAEAEB;color:#6B6870;box-shadow:none;cursor:not-allowed}
+.btn-ghost{padding:10px 22px;background:none;border:1.5px solid #E2D9E0;border-radius:9px;font-weight:600;font-size:14px;color:#3D3A3B;transition:border .15s}
+.btn-ghost:hover{border-color:#954892}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:7px}
+.btn-teal{background:#3ECEB3;border:none;border-radius:9px;font-weight:700;font-size:14px;color:#211E1F;padding:11px 24px}
+ 
+/* ── Badges ───────────────────────────────────── */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.badge-plaid{background:#e6faf7;color:#2aaa93;font-size:10px;padding:2px 7px}
+ 
+/* ── Nav tabs ─────────────────────────────────── */
+.nav-tab{padding:7px 16px;border:none;background:transparent;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;border-radius:6px;transition:.12s}
+.nav-tab.active{background:rgba(255,255,255,.15);color:#fff;font-weight:700}
+.stage-tab{padding:7px 15px;border:none;background:transparent;font-size:12.5px;font-weight:500;color:#6B6870;border-bottom:2px solid transparent;cursor:pointer;transition:.12s}
+.stage-tab:hover{color:#954892}
+.stage-tab.active{color:#954892;font-weight:700;border-bottom-color:#954892}
+ 
+/* ── Table ────────────────────────────────────── */
+th{text-align:left;padding:8px 11px;background:#f8f6f9;border-bottom:1.5px solid #E2D9E0;font-size:10px;font-weight:700;color:#6B6870;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+td{padding:8px 11px;border-bottom:1px solid #f3eff3;font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf5fb}
+ 
+/* ── Progress bar ─────────────────────────────── */
+.pbar-wrap{height:3px;background:#EAEAEB;border-radius:2px;margin-bottom:22px}
+.pbar-fill{height:100%;background:linear-gradient(90deg,#954892,#3ECEB3);border-radius:2px;transition:width .4s}
+ 
+/* ── Sidebar loan row ─────────────────────────── */
+.loan-row{padding:10px 12px;border-bottom:1px solid #E2D9E0;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
+.loan-row:hover{background:#faf5fb}
+.loan-row.active{background:#f3e9f3;border-left-color:#954892}
+ 
+/* ── Plaid button ─────────────────────────────── */
+.plaid-btn{width:100%;padding:13px 16px;border-radius:11px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .18s;text-align:left}
+.plaid-btn.idle{background:#fff;border:2px solid #E2D9E0}
+.plaid-btn.connected{background:#e6faf7;border:2px solid #3ECEB3}
+.plaid-btn:hover.idle{border-color:#3ECEB3}
+ 
+/* ── Choice card ──────────────────────────────── */
+.choice-card{width:100%;padding:14px 16px;border-radius:11px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .15s;text-align:left;margin-bottom:8px}
+.choice-card.unselected{background:#fff;border:2px solid #E2D9E0}
+.choice-card.unselected:hover{border-color:#954892}
+.choice-card.selected{background:#f3e9f3;border:2px solid #954892}
+ 
+/* ── Product card ─────────────────────────────── */
+.prod-card{background:#fff;border-radius:14px;padding:16px 14px;cursor:pointer;position:relative;transition:all .18s;border:2.5px solid #E2D9E0}
+.prod-card:hover{border-color:#954892;box-shadow:0 4px 16px rgba(149,72,146,.12)}
+.prod-card.selected{border-color:#954892;box-shadow:0 6px 22px rgba(149,72,146,.2)}
+ 
+/* ── HITL gate ────────────────────────────────── */
+.hitl{border-left:3px solid #61C16F;background:#f0fdf4;border-radius:0 8px 8px 0;padding:9px 13px}
+ 
+/* ── Risk flags ───────────────────────────────── */
+.flag-warn{background:#fef3e8;border:1px solid #EF9D65;border-radius:8px;padding:9px 12px;display:flex;gap:8px;margin-bottom:7px}
+.flag-info{background:#e0f5fb;border:1px solid #0B89B5;border-radius:8px;padding:9px 12px;display:flex;gap:8px}
+ 
+/* ── Conditions board ─────────────────────────── */
+.cond-col{flex:1}
+.cond-card{background:#fff;border:1px solid #E2D9E0;border-radius:9px;padding:10px 11px;margin-bottom:7px}
+ 
+/* ── Freshness bar ────────────────────────────── */
+.fresh-row{background:#fff;border:1px solid #E2D9E0;border-radius:10px;padding:11px 13px;margin-bottom:8px}
+ 
+/* ── Confetti pieces ──────────────────────────── */
+.confetti-piece{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;animation:confettiFall 1.5s ease-out forwards}
+ 
+/* ── Agent Overlay Panel ───────────────────────────────── */
+#agent-panel{position:fixed;top:48px;right:0;bottom:0;width:380px;background:#fff;border-left:1px solid #E2D9E0;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.2,.8,.4,1);z-index:500;box-shadow:-4px 0 20px rgba(33,30,31,.1)}
+#agent-panel.open{transform:translateX(0)}
+#agent-toggle{position:fixed;top:50%;right:0;transform:translateY(-50%);background:#954892;border:none;color:#fff;padding:12px 7px;border-radius:8px 0 0 8px;cursor:pointer;z-index:501;writing-mode:vertical-rl;text-orientation:mixed;font-size:10.5px;font-weight:800;letter-spacing:.08em;display:flex;flex-direction:column;align-items:center;gap:6px;transition:right .28s cubic-bezier(.2,.8,.4,1)}
+#agent-toggle.panel-open{right:380px}
+#agent-panel-head{padding:13px 16px 10px;border-bottom:1px solid #E2D9E0;flex-shrink:0;background:#faf5fb}
+#agent-panel-body{flex:1;overflow-y:auto;padding:0 0 24px}
+.ap-section{padding:13px 16px 0}
+.ap-section-title{font-size:10px;font-weight:800;color:#6B6870;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.agent-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:700;white-space:nowrap;margin:2px 2px}
+.agent-tag.voice{background:#ede8fc;color:#5b21b6}
+.agent-tag.rag{background:#dff4fb;color:#086789}
+.agent-tag.doc{background:#fce4f3;color:#9d174d}
+.agent-tag.chat{background:#ccfbf1;color:#0d9488}
+.agent-tag.web{background:#fef3c7;color:#92400e}
+.agent-tag.ui{background:#e0f7fa;color:#086789}
+.agent-tag.workflow{background:#f1f5f9;color:#475569}
+.action-row{border:1px solid #E2D9E0;border-radius:9px;overflow:hidden;margin-bottom:8px}
+.action-row-head{padding:7px 11px;display:flex;align-items:center;gap:7px}
+.action-row-body{padding:9px 11px;font-size:12px;color:#3D3A3B;line-height:1.55;background:#fefcfe}
+.hitl-box{border-left:3px solid #61C16F;background:#f0fdf4;border-radius:0 8px 8px 0;padding:9px 12px;margin-bottom:8px}
+.api-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#e0f5fb;color:#086789;margin:2px 2px}
+.comp-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#fce4f3;color:#9d174d;margin:2px 2px}
+.ap-divider{height:1px;background:#E2D9E0;margin:12px 16px}
+.step-ref{font-size:10px;font-weight:700;color:#954892;background:#f3e9f3;padding:2px 8px;border-radius:4px;margin-right:6px}
+</style>
+</head>
+<body>
+ 
+<div id="app">
+  <div id="nav"></div>
+  <div id="main">
+    <div id="view"></div>
+  </div>
+</div>
+ 
+<script>
+// ═══════════════════════════════════════════════════════════
+//  BRAND TOKENS
+// ═══════════════════════════════════════════════════════════
+const C = {
+  purple:'#954892', purpleD:'#7a3a78', purpleL:'#f3e9f3', purpleLL:'#faf5fb',
+  lavender:'#E0C6D9', black:'#211E1F', white:'#FFFFFF',
+  teal:'#3ECEB3', tealD:'#2aaa93', tealL:'#e6faf7',
+  green:'#61C16F', greenL:'#e8f9eb',
+  orange:'#EF9D65', orangeL:'#fef3e8',
+  coral:'#F98080', coralL:'#fde8e8',
+  blue:'#0B89B5', blueL:'#e0f5fb',
+  neutral:'#EAEAEB', bg:'#F7F5FA',
+  gray:'#6B6870', dgray:'#3D3A3B', border:'#E2D9E0',
+};
+ 
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let STATE = {
+  view: 'borrower',      // borrower | workbench | pipeline
+  bStep: 0,              // 0-8 borrower screens
+  bData: {
+    purpose:'purchase', price:425000, down:85000, propType:'sfr', occ:'primary',
+    firstName:'Sarah', lastName:'Chen', email:'sarah.chen@email.com', phone:'(404) 555-0192', dob:'1989-03-15',
+    empType:'w2', salary:78400, bonus:5680, debtAuto:350, debtStudent:280, debtCC:180,
+    plaidIncome:false, plaidAssets:false, plaidAccounts:[], selectedProd:'conv30', sliderLoan:340000,
+  },
+  wbLoan: 'LN-2026-1001',
+  wbTab: 'briefing',
+  wbCleared: new Set(),
+  pipeFilter: 'All',
+  prequalOpen: null,
+};
+ 
+// ═══════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════
+const PRODS = [
+  {id:'conv30',name:'30-Year Fixed',rate:6.875,term:30,minFico:620,minDown:3,maxDti:50,apr:6.991,tag:'Most Popular',tagC:C.purple,who:'Best for buyers wanting payment stability long-term.',pros:['Predictable payments for 30 years','Lower monthly payment vs 15-yr','Maximum budget flexibility'],pmi:true},
+  {id:'conv15',name:'15-Year Fixed',rate:6.125,term:15,minFico:620,minDown:3,maxDti:50,apr:6.284,tag:'Pay Off Faster',tagC:C.blue,who:'Best for buyers who want to build equity fast.',pros:['Save tens of thousands in interest','Build equity 2× faster','Rate ~0.75% lower than 30-yr'],pmi:true},
+  {id:'fha30', name:'FHA 30-Year', rate:6.5,  term:30,minFico:580,minDown:3.5,maxDti:56.9,apr:7.612,tag:'Low Down Payment',tagC:C.teal,who:'Best for first-time buyers with limited savings.',pros:['Only 3.5% down required','Flexible credit requirements','Gift funds allowed'],pmi:false,mip:true},
+  {id:'arm51', name:'5/1 ARM',     rate:6.0,  term:30,minFico:680,minDown:5,  maxDti:50,  apr:7.124,tag:'Lower Start Rate',tagC:C.orange,who:'Best for buyers planning to move within 5 years.',pros:['Lowest initial rate available','Fixed for first 5 years','Save vs 30-yr fixed'],pmi:true},
+];
+ 
+const PIPELINE = [
+  {id:'LN-2026-1001',bwr:'Sarah Chen',   ini:'SC',prod:'30-Yr Fixed',  loan:340000,val:425000,fico:742,inc:7153, dbt:810, stage:'Underwriting',days:2,lock:28,close:'Jun 15',rate:6.875,plaid:true},
+  {id:'LN-2026-1002',bwr:'Marcus Johnson',ini:'MJ',prod:'FHA 30-Yr',   loan:280000,val:309900,fico:698,inc:6200, dbt:680, stage:'Conditions',  days:1,lock:12,close:'Jun 20',rate:6.5,  plaid:false},
+  {id:'LN-2026-1003',bwr:'Emily Rodriguez',ini:'ER',prod:'30-Yr Fixed', loan:520000,val:650000,fico:780,inc:11800,dbt:920, stage:'Processing',  days:3,lock:28,close:'Jun 25',rate:6.875,plaid:true},
+  {id:'LN-2026-1004',bwr:'David Kim',    ini:'DK',prod:'VA 30-Yr',     loan:380000,val:400000,fico:715,inc:8500, dbt:550, stage:'Disclosure',  days:0,lock:28,close:'Jun 18',rate:6.375,plaid:false},
+  {id:'LN-2026-1005',bwr:'Amanda Foster',ini:'AF',prod:'FHA 30-Yr',    loan:195000,val:219900,fico:665,inc:4800, dbt:490, stage:'Documents',   days:4,lock:null,close:'Jul 10',rate:6.5, plaid:false},
+  {id:'LN-2026-1006',bwr:'James Patel',  ini:'JP',prod:'Jumbo 30-Yr',  loan:680000,val:850000,fico:755,inc:14200,dbt:1100,stage:'Closing',     days:1,lock:2, close:'Jun 13',rate:7.125,plaid:true},
+  {id:'LN-2026-1007',bwr:'Lisa Thompson',ini:'LT',prod:'15-Yr Fixed',  loan:365000,val:420000,fico:720,inc:8100, dbt:640, stage:'Application', days:0,lock:null,close:'Jul 20',rate:6.125,plaid:false},
+  {id:'LN-2026-1008',bwr:'Robert Garcia',ini:'RG',prod:'USDA 30-Yr',   loan:210000,val:240000,fico:690,inc:5400, dbt:420, stage:'Pre-Qual',    days:0,lock:null,close:'Aug 1', rate:6.25, plaid:false},
+];
+ 
+// ═══════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════
+const fmt  = n => '$' + Math.round(n||0).toLocaleString();
+const fmtK = n => n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : fmt(n);
+const pct  = n => (+n||0).toFixed(1)+'%';
+ 
+function calcPI(p,r,n) {
+  const m = r/100/12;
+  if (!m || !n) return p/(n||360);
+  return p*(m*Math.pow(1+m,n))/(Math.pow(1+m,n)-1);
+}
+function calcEq5(p,r,t) {
+  const n=t*12, m=r/100/12;
+  if (!m) return p*5/t;
+  const rem = p*(Math.pow(1+m,n)-Math.pow(1+m,60))/(Math.pow(1+m,n)-1);
+  return Math.max(0,p-rem);
+}
+ 
+function stageBadgeStyle(s) {
+  const map = {
+    'Pre-Qual':    ['#f1f5f9','#475569'],
+    'Application': ['#e0edfb','#1a45a8'],
+    'Disclosure':  ['#ede8fc','#5b21b6'],
+    'Documents':   ['#fce4f3','#be185d'],
+    'Processing':  ['#dff4fb','#086789'],
+    'Underwriting':['#dbeafe','#1d4ed8'],
+    'Conditions':  ['#fef3e0','#b45309'],
+    'Closing':     ['#dcfce7','#15803d'],
+    'Funded':      ['#d1fae5','#064e3b'],
+  };
+  const [bg,c] = map[s] || map['Pre-Qual'];
+  return `display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;background:${bg};color:${c};white-space:nowrap`;
+}
+ 
+function el(tag, attrs={}, ...children) {
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k === 'style' && typeof v === 'object') Object.assign(e.style, v);
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else e.setAttribute(k, v);
+  }
+  for (const c of children.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    e.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return e;
+}
+const div  = (a,...c) => el('div',a,...c);
+const span = (a,...c) => el('span',a,...c);
+const btn  = (a,...c) => el('button',a,...c);
+const inp  = (a)      => el('input',a);
+const lbl  = (a,...c) => el('label',a,...c);
+const p    = (a,...c) => el('p',a,...c);
+const h2   = (a,...c) => el('h2',a,...c);
+const h3   = (a,...c) => el('h3',a,...c);
+ 
+// ═══════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════
+function render() {
+  document.getElementById('nav').innerHTML = '';
+  document.getElementById('nav').appendChild(buildNav());
+  const view = document.getElementById('view');
+  view.innerHTML = '';
+  if (STATE.view === 'borrower')  view.appendChild(buildBorrower());
+  else if (STATE.view === 'workbench') view.appendChild(buildWorkbench());
+  else view.appendChild(buildPipeline());
+}
+ 
+function go(view) { STATE.view = view; render(); }
+ 
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION BAR
+// ═══════════════════════════════════════════════════════════
+function buildNav() {
+  return div({style:{background:C.black,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',height:'48px',flexShrink:0}},
+    div({style:{display:'flex',alignItems:'center',gap:'8px'}},
+      div({style:{width:'30px',height:'30px',borderRadius:'7px',background:'linear-gradient(135deg,#954892,#6161E0)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}, '✦'),
+      div({},
+        div({style:{fontWeight:'800',fontSize:'15px',color:'#fff',lineHeight:'1'}},'SimplifyX™'),
+        div({style:{fontSize:'9px',color:'rgba(255,255,255,.35)',letterSpacing:'.08em'}},'MORTGAGE')
+      )
+    ),
+    div({style:{display:'flex',gap:'2px'}},
+      ...['borrower|🏡 Borrower','workbench|🖥 Loan Officer','pipeline|📋 Pipeline'].map(s => {
+        const [v,label] = s.split('|');
+        const t = btn({'class':'nav-tab'+(STATE.view===v?' active':''), onClick:()=>go(v)}, label);
+        return t;
+      })
+    ),
+    span({style:{fontSize:'11px',color:'rgba(255,255,255,.35)'}},'📞 (800) 555-2947')
+  );
+}
+ 
+// ═══════════════════════════════════════════════════════════
+//  BORROWER PORTAL
+// ═══════════════════════════════════════════════════════════
+function buildBorrower() {
+  const screens = [bS0,bS1,bS2,bS3,bS4,bS5,bS6,bS7];
+  const fn = screens[Math.min(STATE.bStep, screens.length-1)];
+  const wrap = div({class:'su'}, fn());
+  return wrap;
+}
+ 
+function progBar(step,total) {
+  return div({class:'pbar-wrap'},
+    div({class:'pbar-fill',style:{width:Math.round(step/total*100)+'%'}})
+  );
+}
+ 
+function qHead(eyebrow, question, sub, icon) {
+  return div({style:{textAlign:'center',marginBottom:'22px'}},
+    icon ? div({style:{fontSize:'38px',marginBottom:'10px'}}, icon) : null,
+    eyebrow ? div({style:{fontSize:'11px',fontWeight:'700',color:C.purple,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'6px'}}, eyebrow) : null,
+    h2({style:{fontSize:'24px',fontWeight:'800',color:C.black,lineHeight:'1.2',marginBottom:sub?'8px':'0'}}, question),
+    sub ? p({style:{fontSize:'14px',color:C.gray,lineHeight:'1.6',maxWidth:'440px',margin:'0 auto'}}, sub) : null
+  );
+}
+ 
+function bNavRow(onBack, onNext, nextLabel, nextDisabled) {
+  const row = div({style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'20px',paddingTop:'16px',borderTop:'1px solid '+C.border}});
+  if (onBack) {
+    row.appendChild(btn({'class':'btn-ghost', onClick:onBack}, '← Back'));
+  } else {
+    row.appendChild(div({}));
+  }
+  const nb = btn({'class':'btn-primary'+(nextDisabled?' disabled':''), onClick: nextDisabled?null:onNext});
+  nb.textContent = nextLabel || 'Continue →';
+  if (nextDisabled) nb.disabled = true;
+  row.appendChild(nb);
+  return row;
+}
+ 
+function choiceCard(icon, title, desc, isSelected, onClick) {
+  const card = btn({'class':'choice-card '+(isSelected?'selected':'unselected'), onClick});
+  card.appendChild(div({style:{width:'38px',height:'38px',borderRadius:'9px',background:isSelected?C.purple:C.neutral,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',flexShrink:'0',transition:'all .15s'}}, icon));
+  card.appendChild(div({style:{flex:'1'}},
+    div({style:{fontWeight:'700',fontSize:'14px',color:isSelected?C.purple:C.black}}, title),
+    desc ? div({style:{fontSize:'12px',color:C.gray,marginTop:'2px'}}, desc) : null
+  ));
+  card.appendChild(div({style:{width:'18px',height:'18px',borderRadius:'50%',border:'2px solid '+(isSelected?C.purple:C.border),background:isSelected?C.purple:'transparent',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'10px',flexShrink:'0'}}, isSelected?'✓':''));
+  return card;
+}
+ 
+function plaidBtn(connected, onConnect, label) {
+  const b = div({'class':'plaid-btn '+(connected?'connected':'idle'), onClick: connected?null:onConnect});
+  const iconBox = div({style:{width:'38px',height:'38px',borderRadius:'9px',background:connected?C.teal:'#000',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0'}});
+  if (connected) {
+    iconBox.appendChild(span({style:{color:'#fff',fontWeight:'700',fontSize:'16px'}},'✓'));
+  } else {
+    iconBox.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="7" width="5" height="9" rx="1" fill="white"/><rect x="7.5" y="3" width="5" height="13" rx="1" fill="white" opacity=".7"/><rect x="13" y="5" width="5" height="11" rx="1" fill="white" opacity=".5"/></svg>`;
+  }
+  b.appendChild(iconBox);
+  b.appendChild(div({style:{flex:'1'}},
+    div({style:{fontWeight:'700',fontSize:'13.5px',color:connected?C.tealD:C.black}}, connected?'Connected to Plaid ✓':label),
+    div({style:{fontSize:'11.5px',color:C.gray,marginTop:'2px'}}, connected?'Verified. No manual entry needed.':'Bank-level security · 256-bit encrypted · Instant')
+  ));
+  if (!connected) b.appendChild(span({style:{fontSize:'12px',fontWeight:'700',color:C.blue,flexShrink:'0'}},'Connect →'));
+  return b;
+}
+ 
+function moneyField(labelText, value, onChange, placeholder) {
+  const wrapper = div({});
+  wrapper.appendChild(lbl({'class':'lbl'},labelText));
+  const moneyWrap = div({'class':'money-wrap'});
+  moneyWrap.appendChild(span({'class':'dollar'},'$'));
+  const i = inp({'class':'inp inp-money',type:'number',value:value||'',placeholder:placeholder||''});
+  i.addEventListener('input', e => onChange(+e.target.value));
+  moneyWrap.appendChild(i);
+  wrapper.appendChild(moneyWrap);
+  return wrapper;
+}
+ 
+function textField(labelText, value, onChange, type, placeholder) {
+  return div({},
+    lbl({'class':'lbl'}, labelText),
+    (() => {
+      const i = inp({'class':'inp',type:type||'text',value:value||'',placeholder:placeholder||''});
+      i.addEventListener('input', e => onChange(e.target.value));
+      return i;
+    })()
+  );
+}
+ 
+function trust(items) {
+  return div({style:{display:'flex',justifyContent:'center',gap:'16px',flexWrap:'wrap',marginTop:'12px'}},
+    ...items.map(t => div({style:{display:'flex',alignItems:'center',gap:'4px',fontSize:'12px',color:C.gray}},
+      span({style:{color:C.green}},'✓'), t
+    ))
+  );
+}
+ 
+// ─── Screen 0: Landing ───────────────────────────────────
+function bS0() {
+  const rates = [['30-Year Fixed','6.875%',fmt(calcPI(340000,6.875,30))],['15-Year Fixed','6.125%',fmt(calcPI(340000,6.125,15))],['FHA 30-Year','6.500%',fmt(calcPI(340000,6.5,30))],['5/1 ARM','6.000%',fmt(calcPI(340000,6.0,30))]];
+  return div({},
+    // Hero
+    div({style:{background:'linear-gradient(135deg,#211E1F 0%,#3d1a3c 50%,#954892 100%)',padding:'52px 28px 68px',position:'relative',overflow:'hidden'}},
+      div({style:{position:'absolute',top:'-60px',right:'-60px',width:'280px',height:'280px',borderRadius:'50%',background:'rgba(149,72,146,.12)',pointerEvents:'none'}}),
+      div({style:{maxWidth:'1060px',margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 380px',gap:'52px',alignItems:'center'}},
+        div({'class':'su'},
+          div({style:{display:'inline-flex',alignItems:'center',gap:'6px',padding:'4px 12px',background:'rgba(224,198,217,.15)',borderRadius:'20px',fontSize:'11px',fontWeight:'600',color:'#E0C6D9',marginBottom:'16px',letterSpacing:'.04em'}},'✦ AI-Powered · Human-Verified'),
+          el('h1',{style:{fontSize:'40px',fontWeight:'800',color:'#fff',lineHeight:'1.1',marginBottom:'12px',letterSpacing:'-.02em'}},
+            'Your mortgage,',el('br',{}),' ',el('span',{style:{color:'#E0C6D9'}},'without the headache.')
+          ),
+          p({style:{fontSize:'15px',color:'rgba(255,255,255,.55)',lineHeight:'1.7',maxWidth:'440px',marginBottom:'30px'}},
+            'Connect your bank. Answer a few questions. Get pre-qualified in minutes — with real options and real numbers.'
+          ),
+          div({style:{display:'flex',gap:'28px',flexWrap:'wrap'}},
+            ...[['$2.4B+','Funded \'25'],['97%','Satisfaction'],['~20 min','Pre-Qual'],['47','States']].map(([v,l]) =>
+              div({},
+                div({style:{fontSize:'20px',fontWeight:'800',color:'#E0C6D9'}},v),
+                div({style:{fontSize:'10px',color:'rgba(255,255,255,.3)',marginTop:'2px'}},l)
+              )
+            )
+          )
+        ),
+        // Lead card
+        div({style:{background:'#fff',borderRadius:'16px',padding:'26px',boxShadow:'0 12px 40px rgba(0,0,0,.25)'}},
+          h2({style:{fontSize:'19px',fontWeight:'800',marginBottom:'4px'}},'Get your personalized rate'),
+          p({style:{fontSize:'12.5px',color:C.gray,marginBottom:'18px'}},'No credit score impact. Takes about 20 minutes.'),
+          (() => { const b = btn({'class':'btn-primary',style:{width:'100%',padding:'14px',fontSize:'15px'}, onClick:()=>{STATE.bStep=1;render();}},'Start My Pre-Qualification →'); return b; })(),
+          trust(['No hard credit pull','256-bit encrypted','No spam'])
+        )
+      )
+    ),
+    // Rates table
+    div({style:{maxWidth:'1060px',margin:'0 auto',padding:'36px 28px 20px'}},
+      h2({style:{fontSize:'20px',fontWeight:'800',marginBottom:'4px'}},"Today's rates"),
+      p({style:{color:C.gray,fontSize:'12.5px',marginBottom:'16px'}},'June 12, 2026 · $340K loan, 20% down, 740 FICO · Subject to change'),
+      div({style:{background:'#fff',border:'1px solid '+C.border,borderRadius:'13px',overflow:'hidden',marginBottom:'20px'}},
+        div({style:{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1.2fr',padding:'9px 18px',background:C.bg,borderBottom:'1px solid '+C.border}},
+          ...['Loan Type','Rate','APR','Est. P&I/mo'].map(h => div({style:{fontSize:'10px',fontWeight:'700',color:C.gray,textTransform:'uppercase',letterSpacing:'.05em'}},h))
+        ),
+        ...rates.map(([name,rate,mo],i) => {
+          const row = div({style:{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1.2fr',padding:'13px 18px',borderBottom:i<rates.length-1?'1px solid '+C.border:'none',cursor:'pointer',transition:'.12s'}});
+          row.addEventListener('mouseenter',()=>row.style.background=C.purpleLL);
+          row.addEventListener('mouseleave',()=>row.style.background='');
+          row.appendChild(div({style:{fontWeight:'600',fontSize:'14px'}},name));
+          row.appendChild(div({style:{fontWeight:'800',fontSize:'15px',color:C.purple}},rate));
+          row.appendChild(div({style:{fontSize:'12.5px',color:C.gray}},(parseFloat(rate)+0.116).toFixed(3)+'%'));
+          row.appendChild(div({style:{fontWeight:'700',fontSize:'13px'}},mo+'/mo'));
+          return row;
+        })
+      )
+    )
+  );
+}
+ 
+// ─── Screen 1: Purpose ───────────────────────────────────
+function bS1() {
+  const B = STATE.bData;
+  return div({style:{maxWidth:'520px',margin:'0 auto',padding:'24px 16px 60px'}},
+    progBar(1,7),
+    qHead('Let\'s get started','What would you like to do?',null,'🏡'),
+    choiceCard('🏡','Buy a home','Purchase a primary, second, or investment property',B.purpose==='purchase',()=>{STATE.bData.purpose='purchase';render();}),
+    choiceCard('🔄','Refinance my mortgage','Lower your rate or payment on your current home',B.purpose==='refi',()=>{STATE.bData.purpose='refi';render();}),
+    choiceCard('💰','Cash-out refinance','Tap your home equity for renovations or other needs',B.purpose==='cashout',()=>{STATE.bData.purpose='cashout';render();}),
+    bNavRow(()=>{STATE.bStep=0;render();},()=>{STATE.bStep=2;render();},'Continue →',!B.purpose)
+  );
+}
+ 
+// ─── Screen 2: Property ──────────────────────────────────
+function bS2() {
+  const B = STATE.bData;
+  const loan = Math.max(0,(B.price||0)-(B.down||0));
+  const dnPct = B.price?(B.down/B.price*100):0;
+  return div({style:{maxWidth:'540px',margin:'0 auto',padding:'24px 16px 60px'}},
+    progBar(2,7),
+    qHead('The property','How much is the home?','An estimate is fine — update it later.'),
+    div({'class':'card',style:{marginBottom:'12px'}},
+      div({'class':'g2',style:{marginBottom:'14px'}},
+        (() => {
+          const f = moneyField('Purchase price',B.price,v=>{STATE.bData.price=v;render();},'425,000');
+          return f;
+        })(),
+        (() => {
+          const f = moneyField('Down payment',B.down,v=>{STATE.bData.down=v;render();},'85,000');
+          return f;
+        })()
+      ),
+      B.price>0&&B.down>0 ? div({'class':'pi',style:{background:'linear-gradient(135deg,'+C.purpleL+','+C.tealL+')',borderRadius:'10px',padding:'13px 16px',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px'}},
+        ...[[fmt(loan),'Loan amount'],[pct(dnPct),'Down'],[pct(100-dnPct),'LTV']].map(([v,l]) =>
+          div({style:{textAlign:'center'}},
+            div({style:{fontSize:'18px',fontWeight:'800',color:C.purple}},v),
+            div({style:{fontSize:'10.5px',color:C.gray,marginTop:'2px'}},l)
+          )
+        )
+      ) : null
+    ),
+    div({'class':'card'},
+      div({'class':'g2'},
+        div({},
+          lbl({'class':'lbl'},'Property type'),
+          (() => {
+            const s = el('select',{'class':'inp sel'});
+            [['sfr','Single family home'],['condo','Condo'],['townhome','Townhome']].forEach(([v,l]) => { const o=el('option',{value:v},l); if(B.propType===v)o.selected=true; s.appendChild(o); });
+            s.addEventListener('change',e=>{ STATE.bData.propType=e.target.value; });
+            return s;
+          })()
+        ),
+        div({},
+          lbl({'class':'lbl'},'How will you use it?'),
+          (() => {
+            const s = el('select',{'class':'inp sel'});
+            [['primary','Primary residence'],['second','Second home'],['investment','Investment']].forEach(([v,l]) => { const o=el('option',{value:v},l); if(B.occ===v)o.selected=true; s.appendChild(o); });
+            s.addEventListener('change',e=>{ STATE.bData.occ=e.target.value; });
+            return s;
+          })()
+        )
+      )
+    ),
+    bNavRow(()=>{STATE.bStep=1;render();},()=>{STATE.bStep=3;render();},'Continue →',!B.price||!B.down)
+  );
+}
+ 
+// ─── Screen 3: Contact ───────────────────────────────────
+function bS3() {
+  const B = STATE.bData;
+  return div({style:{maxWidth:'520px',margin:'0 auto',padding:'24px 16px 60px'}},
+    progBar(3,7),
+    qHead('About you',"What's your name and email?","We'll send your pre-qualification results here."),
+    div({'class':'card'},
+      div({'class':'g2',style:{marginBottom:'12px'}},
+        textField('First name',B.firstName,v=>STATE.bData.firstName=v,'text','Sarah'),
+        textField('Last name',B.lastName,v=>STATE.bData.lastName=v,'text','Chen')
+      ),
+      div({'class':'g2',style:{marginBottom:'12px'}},
+        textField('Email address',B.email,v=>STATE.bData.email=v,'email','sarah@email.com'),
+        textField('Mobile phone',B.phone,v=>STATE.bData.phone=v,'tel','(404) 555-0192')
+      ),
+      textField('Date of birth',B.dob,v=>STATE.bData.dob=v,'date','')
+    ),
+    trust(['No spam','No credit impact','Unsubscribe anytime']),
+    bNavRow(()=>{STATE.bStep=2;render();},()=>{STATE.bStep=4;render();},'Continue →',!B.firstName||!B.email)
+  );
+}
+ 
+// ─── Screen 4: Income ────────────────────────────────────
+function bS4() {
+  const B = STATE.bData;
+  const gross = ((B.salary||0)+(B.bonus||0))/12;
+  const debts = (B.debtAuto||0)+(B.debtStudent||0)+(B.debtCC||0);
+  const pi = calcPI((B.price||425000)-(B.down||85000),6.875,30);
+  const dti = gross>0?((pi+debts)/gross*100):0;
+ 
+  function connectPlaidIncome() {
+    setTimeout(()=>{ STATE.bData.plaidIncome=true; STATE.bData.salary=78400; STATE.bData.bonus=5680; render(); }, 2000);
+    // show loading state immediately
+    const btnEl = document.getElementById('plaid-income-btn');
+    if (btnEl) { btnEl.style.borderColor=C.teal; btnEl.style.opacity='0.7'; }
+  }
+ 
+  const empSel = el('select',{'class':'inp sel',style:{marginBottom:'12px'}});
+  [['w2','W-2 employee'],['self','Self-employed / 1099'],['retired','Retired'],['military','Military / VA']].forEach(([v,l]) => { const o=el('option',{value:v},l); if(B.empType===v)o.selected=true; empSel.appendChild(o); });
+  empSel.addEventListener('change',e=>{ STATE.bData.empType=e.target.value; render(); });
+ 
+  return div({style:{maxWidth:'560px',margin:'0 auto',padding:'24px 16px 60px'}},
+    progBar(4,7),
+    qHead('Your income','How do you earn your income?','Connect your payroll for instant verification — no pay stubs needed yet.'),
+    div({'class':'card',style:{marginBottom:'12px'}},
+      div({},
+        lbl({'class':'lbl'},'Employment type'),
+        empSel
+      ),
+      div({style:{marginBottom:'14px'}},
+        lbl({'class':'lbl'},'Verify income instantly'),
+        div({id:'plaid-income-btn'},
+          plaidBtn(B.plaidIncome, connectPlaidIncome, 'Connect payroll with Plaid')
+        )
+      ),
+      B.plaidIncome
+        ? div({'class':'pi',style:{background:C.tealL,border:'1.5px solid '+C.teal,borderRadius:'10px',padding:'12px 14px',marginBottom:'14px'}},
+            div({style:{fontWeight:'700',color:C.tealD,marginBottom:'8px',fontSize:'13px'}},'✓ Income verified from Acme Corp'),
+            div({'class':'g3',style:{fontSize:'12px',gap:'10px'}},
+              ...[[' Base salary',fmt(B.salary)+'/yr'],['Overtime/bonus',fmt(B.bonus)+'/yr'],['Monthly income',fmt(gross)+'/mo']].map(([l,v]) =>
+                div({},
+                  div({style:{color:C.gray,fontSize:'10.5px'}},l),
+                  div({style:{fontWeight:'700',color:l==='Monthly income'?C.purple:C.black}},v)
+                )
+              )
+            )
+          )
+        : div({},
+            div({style:{display:'flex',alignItems:'center',gap:'8px',margin:'10px 0',color:C.gray,fontSize:'12.5px'}},
+              div({style:{flex:'1',height:'1px',background:C.border}}),
+              span({},'or enter manually'),
+              div({style:{flex:'1',height:'1px',background:C.border}})
+            ),
+            div({'class':'g2'},
+              moneyField('Annual base salary',B.salary,v=>{STATE.bData.salary=v;render();},'78,400'),
+              moneyField('Overtime / bonus',B.bonus,v=>{STATE.bData.bonus=v;render();},'5,680')
+            )
+          )
+    ),
+    div({'class':'card'},
+      div({style:{fontWeight:'700',fontSize:'14px',marginBottom:'3px'}},'Monthly debt payments'),
+      p({style:{fontSize:'12.5px',color:C.gray,marginBottom:'12px'}},"Minimum payments only — don't include current rent."),
+      div({'class':'g3'},
+        moneyField('Auto loans',B.debtAuto,v=>{STATE.bData.debtAuto=v;render();},'350'),
+        moneyField('Student loans',B.debtStudent,v=>{STATE.bData.debtStudent=v;render();},'280'),
+        moneyField('Credit cards',B.debtCC,v=>{STATE.bData.debtCC=v;render();},'180')
+      ),
+      gross>0 ? div({style:{marginTop:'12px',padding:'10px 13px',background:C.purpleLL,borderRadius:'9px',display:'flex',gap:'20px'}},
+        ...[[' Income',fmt(gross)+'/mo',C.purple],['Debts',fmt(debts)+'/mo',C.black],['Back DTI',pct(dti),dti>45?C.orange:C.green]].map(([l,v,c]) =>
+          div({},div({style:{fontSize:'10.5px',color:C.gray}},l),div({style:{fontWeight:'700',fontSize:'14px',color:c}},v))
+        )
+      ) : null
+    ),
+    bNavRow(()=>{STATE.bStep=3;render();},()=>{STATE.bStep=5;render();},'Continue →',!B.salary&&!B.plaidIncome)
+  );
+}
+ 
+// ─── Screen 5: PRE-QUAL — WOW SCREEN ─────────────────────
+function bS5() {
+  const B = STATE.bData;
+  const price = B.price||425000;
+  const down  = B.down||85000;
+  const ltv   = ((B.sliderLoan||340000)/price)*100;
+  const sliderLoan = B.sliderLoan||340000;
+  const income = ((B.salary||78400)+(B.bonus||5680))/12;
+  const debts  = (B.debtAuto||350)+(B.debtStudent||280)+(B.debtCC||180);
+ 
+  const eligible = PRODS.filter(p => {
+    if ((B.fico||742) < p.minFico) return false;
+    if ((100-ltv) < p.minDown) return false;
+    return true;
+  });
+ 
+  const selProd = eligible.find(p=>p.id===B.selectedProd)||eligible[0];
+  const selPI   = selProd ? calcPI(sliderLoan,selProd.rate,selProd.term) : 0;
+  const selPITI = selPI + price*0.0125/12 + price*0.004/12;
+  const selPMI  = (selProd?.pmi&&ltv>80) ? sliderLoan*0.006/12 : 0;
+  const selTotal= selPITI+selPMI;
+  const selEq5  = selProd ? (down+calcEq5(sliderLoan,selProd.rate,selProd.term)) : down;
+ 
+  // Confetti
+  setTimeout(()=>{
+    const pieces = document.querySelectorAll('.confetti-piece');
+    pieces.forEach(p=>p.remove());
+  },3500);
+ 
+  const confettiItems = [C.purple,C.teal,C.green,C.orange,C.lavender].flatMap((c,ci) =>
+    [0,1].map(j => {
+      const idx = ci*2+j;
+      const piece = div({'class':'confetti-piece',style:{
+        top:'48px', left:(4+idx*6)+'%',
+        background:c,
+        animationDuration:(1.2+idx*0.1)+'s',
+        animationDelay:(idx*0.06)+'s'
+      }});
+      return piece;
+    })
+  );
+ 
+  // Slider
+  const sliderEl = inp({type:'range',min:50000,max:750000,step:5000,value:sliderLoan,style:{width:'100%',accentColor:C.teal,cursor:'pointer'}});
+  const loanDisp = div({style:{fontSize:'26px',fontWeight:'800',color:'#E0C6D9'}}, fmt(Math.round(sliderLoan)));
+  const totalDisp= div({style:{fontSize:'24px',fontWeight:'800',color:C.teal}}, fmt(Math.round(selTotal))+'/mo');
+  const piDisp   = div({style:{fontSize:'15px',fontWeight:'700'}}, fmt(Math.round(selPI)));
+  const tiDisp   = div({style:{fontSize:'15px',fontWeight:'700'}}, fmt(Math.round(selPITI-selPI)));
+  const eq5Disp  = div({style:{fontSize:'15px',fontWeight:'700'}}, fmt(Math.round(selEq5)));
+ 
+  sliderEl.addEventListener('input', e => {
+    STATE.bData.sliderLoan = +e.target.value;
+    render(); // Full re-render for live update
+  });
+ 
+  // Product cards
+  const prodGrid = div({style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:'13px',marginBottom:'20px'}});
+  eligible.forEach(p => {
+    const mo    = calcPI(sliderLoan,p.rate,p.term);
+    const piti2 = mo + price*0.0125/12 + price*0.004/12;
+    const pmi2  = (p.pmi&&ltv>80) ? sliderLoan*0.006/12 : 0;
+    const mip2  = p.mip ? sliderLoan*0.0055/12 : 0;
+    const total2= piti2+pmi2+mip2;
+    const eq5   = down+calcEq5(sliderLoan,p.rate,p.term);
+    const totalInt = Math.max(0,mo*p.term*12-sliderLoan);
+    const isSel = B.selectedProd===p.id;
+    const isOpen= STATE.prequalOpen===p.id;
+ 
+    const card = div({'class':'prod-card'+(isSel?' selected':'')});
+    card.addEventListener('click',()=>{ STATE.bData.selectedProd=p.id; render(); });
+ 
+    if (isSel) {
+      card.appendChild(div({style:{position:'absolute',top:'-10px',left:'50%',transform:'translateX(-50%)',background:C.purple,color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 12px',borderRadius:'9px',whiteSpace:'nowrap'}}, '✓ Selected'));
+    }
+ 
+    card.appendChild(div({style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'11px'}},
+      div({},
+        div({style:{fontWeight:'800',fontSize:'14px',color:C.black}},p.name),
+        span({style:{fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'10px',background:p.tagC+'18',color:p.tagC,marginTop:'3px',display:'inline-block'}},p.tag)
+      ),
+      div({style:{textAlign:'right'}},
+        div({style:{fontSize:'22px',fontWeight:'800',color:C.purple}},
+          fmt(Math.round(total2)),
+          span({style:{fontSize:'10.5px',color:C.gray,fontWeight:'400'}},'/mo')
+        ),
+        div({style:{fontSize:'10px',color:C.gray}},'incl. tax & ins')
+      )
+    ));
+ 
+    card.appendChild(div({style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px',marginBottom:'11px'}},
+      ...[['Rate',p.rate+'%'],['APR',p.apr+'%'],['5-yr equity',fmtK(Math.round(eq5))],['Total interest',fmtK(Math.round(totalInt))]].map(([l,v]) =>
+        div({style:{background:C.bg,borderRadius:'7px',padding:'6px 8px'}},
+          div({style:{fontSize:'10px',color:C.gray}},l),
+          div({style:{fontWeight:'700',fontSize:'12.5px'}},v)
+        )
+      )
+    ));
+ 
+    card.appendChild(div({style:{fontSize:'12px',color:C.dgray,lineHeight:'1.5',marginBottom:'9px',borderTop:'1px solid '+C.border,paddingTop:'9px'}},p.who));
+ 
+    const detailBtn = btn({style:{width:'100%',padding:'6px',border:'1px solid '+C.border,borderRadius:'7px',background:'none',fontSize:'12px',fontWeight:'600',color:C.gray,cursor:'pointer'}},
+      isOpen?'Hide details ↑':'See full breakdown ↓');
+    detailBtn.addEventListener('click', e => { e.stopPropagation(); STATE.prequalOpen=isOpen?null:p.id; render(); });
+    card.appendChild(detailBtn);
+ 
+    if (isOpen) {
+      const detail = div({'class':'su',style:{marginTop:'9px',paddingTop:'9px',borderTop:'1px solid '+C.border}});
+      detail.appendChild(div({style:{fontSize:'11.5px',fontWeight:'700',color:C.dgray,marginBottom:'6px'}},'What\'s in '+fmt(Math.round(total2))+'/mo'));
+      const lines = [
+        ['P&I',fmt(Math.round(mo))],
+        ['Property taxes',fmt(Math.round(price*0.0125/12))],
+        ["Homeowner's insurance",fmt(Math.round(price*0.004/12))],
+      ];
+      if (pmi2>0) lines.push(['PMI (removed at 80% LTV)',fmt(Math.round(pmi2))]);
+      if (mip2>0) lines.push(['FHA annual MIP',fmt(Math.round(mip2))]);
+      lines.forEach(([l,v]) => {
+        detail.appendChild(div({style:{display:'flex',justifyContent:'space-between',padding:'4px 0',borderBottom:'1px dashed '+C.border,fontSize:'12px'}},
+          span({style:{color:C.dgray}},l), el('strong',{},v)
+        ));
+      });
+      detail.appendChild(div({style:{marginTop:'8px'}},
+        ...p.pros.map(pr => div({style:{display:'flex',gap:'5px',fontSize:'12px',marginBottom:'3px'}},
+          span({style:{color:C.green}},'✓'), span({style:{color:C.dgray}},pr)
+        ))
+      ));
+      card.appendChild(detail);
+    }
+    prodGrid.appendChild(card);
+  });
+ 
+  return div({},
+    div({style:{height:'3px',background:C.neutral}},
+      div({style:{height:'100%',background:'linear-gradient(90deg,'+C.purple+','+C.teal+')',width:'60%',borderRadius:'2px'}})
+    ),
+    ...confettiItems,
+    div({style:{maxWidth:'960px',margin:'0 auto',padding:'24px 16px 60px'}},
+      // Hero moment
+      div({style:{textAlign:'center',marginBottom:'24px'}},
+        div({style:{fontSize:'40px',marginBottom:'8px'}},'🎉'),
+        h2({style:{fontSize:'28px',fontWeight:'800',color:C.black,letterSpacing:'-.01em',marginBottom:'6px'}},
+          'You pre-qualify for ',span({style:{color:C.purple}},eligible.length+' loan options!')
+        ),
+        p({style:{fontSize:'14px',color:C.gray,maxWidth:'460px',margin:'0 auto'}},'Same numbers you\'ll see in your official Loan Estimate.')
+      ),
+      // Live slider
+      div({style:{background:'linear-gradient(135deg,#211E1F,#3d1a3c)',borderRadius:'15px',padding:'18px 20px',marginBottom:'20px',color:'#fff'}},
+        div({style:{fontSize:'12px',fontWeight:'600',color:'rgba(255,255,255,.4)',marginBottom:'8px'}},'Drag to explore different loan amounts'),
+        div({style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
+          div({},
+            div({style:{fontSize:'11px',color:'rgba(255,255,255,.35)'}},'Loan amount'),
+            loanDisp
+          ),
+          div({style:{textAlign:'right'}},
+            div({style:{fontSize:'11px',color:'rgba(255,255,255,.35)'}},'Est. total payment'),
+            totalDisp
+          )
+        ),
+        sliderEl,
+        div({style:{display:'flex',justifyContent:'space-between',fontSize:'10.5px',color:'rgba(255,255,255,.25)',marginTop:'3px'}},
+          span({},'$50K'),span({},'$750K')
+        ),
+        div({style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',borderTop:'1px solid rgba(255,255,255,.1)',paddingTop:'13px',marginTop:'13px'}},
+          ...[[piDisp,'P&I payment'],[tiDisp,'Tax & insurance'],[eq5Disp,'5-yr equity']].map(([vEl,l]) =>
+            div({style:{textAlign:'center'}},
+              div({style:{fontSize:'10px',color:'rgba(255,255,255,.35)',marginBottom:'2px'}},l),
+              vEl
+            )
+          )
+        )
+      ),
+      prodGrid,
+      // LE notice
+      div({style:{background:'linear-gradient(135deg,'+C.purpleL+','+C.tealL+')',border:'1px solid '+C.lavender,borderRadius:'13px',padding:'16px 18px',marginBottom:'20px',display:'flex',gap:'12px',alignItems:'center'}},
+        span({style:{fontSize:'26px',flexShrink:'0'}},'📋'),
+        div({},
+          div({style:{fontWeight:'700',fontSize:'14px',marginBottom:'3px'}},'These numbers match your official Loan Estimate'),
+          p({style:{fontSize:'12.5px',color:C.dgray,lineHeight:'1.55'}},"Payment breakdowns use real rates and the same methodology as your federally-required LE. Your loan officer will issue the official Loan Estimate within 3 business days.")
+        )
+      ),
+      // Bottom nav
+      div({style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+        btn({'class':'btn-ghost',onClick:()=>{STATE.bStep=4;render();}},'← Back'),
+        selProd ? div({style:{textAlign:'center',fontSize:'12px',color:C.gray}},selProd.name+' · '+fmt(Math.round(selTotal))+'/mo') : null,
+        btn({'class':'btn-primary',style:{fontSize:'15px',padding:'13px 28px'},onClick:()=>{STATE.bStep=6;render();}},'Start Full Application →')
+      )
+    )
+  );
+}
+ 
+// ─── Screen 6: Assets / Plaid ─────────────────────────────
+function bS6() {
+  const B = STATE.bData;
+  const price  = B.price||425000;
+  const down   = B.down||85000;
+  const needed = down + Math.round(price*0.025);
+  const total  = (B.plaidAccounts||[]).reduce((s,a)=>s+a.bal,0);
+  const liquid = (B.plaidAccounts||[]).filter(a=>a.t!=='Investment').reduce((s,a)=>s+a.bal,0);
+ 
+  function connectPlaidAssets() {
+    setTimeout(()=>{
+      STATE.bData.plaidAssets=true;
+      STATE.bData.plaidAccounts=[
+        {t:'Checking',n:'Chase Total Checking',mask:'4891',bal:42800},
+        {t:'Savings',  n:'Chase Savings',       mask:'2204',bal:28500},
+        {t:'Investment',n:'Fidelity 401(k)',    mask:'7823',bal:89200},
+      ];
+      render();
+    }, 2000);
+    const btnEl = document.getElementById('plaid-assets-btn');
+    if (btnEl) { btnEl.style.opacity='0.7'; }
+  }
+ 
+  const accts = B.plaidAssets && B.plaidAccounts.length>0
+    ? div({'class':'su',style:{marginTop:'14px'}},
+        div({'class':'g3',style:{marginBottom:'13px'}},
+          ...[[fmt(total),'Total assets'],[fmt(liquid),'Liquid'],[total>=needed?'✓ Sufficient':'⚠ Review','Down + closing']].map(([v,l],i) =>
+            div({style:{background:C.bg,borderRadius:'9px',padding:'10px 11px',textAlign:'center'}},
+              div({style:{fontSize:'16px',fontWeight:'800',color:i===2&&total>=needed?C.green:i===2?C.orange:C.purple}},v),
+              div({style:{fontSize:'10px',color:C.gray,marginTop:'2px'}},l)
+            )
+          )
+        ),
+        ...B.plaidAccounts.map(a =>
+          div({style:{display:'flex',gap:'11px',alignItems:'center',padding:'10px 12px',background:C.bg,borderRadius:'9px',marginBottom:'7px'}},
+            div({style:{width:'32px',height:'32px',borderRadius:'8px',background:a.t==='Checking'?C.purple:a.t==='Savings'?C.teal:C.blue,color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px',flexShrink:'0'}},
+              a.t==='Checking'?'🏦':a.t==='Savings'?'💰':'📈'),
+            div({style:{flex:'1'}},
+              div({style:{fontWeight:'600',fontSize:'13px'}},a.n),
+              div({style:{fontSize:'11px',color:C.gray}},'•••• '+a.mask+' · '+a.t)
+            ),
+            div({style:{textAlign:'right'}},
+              div({style:{fontWeight:'800',fontSize:'14px'}},fmt(a.bal)),
+              div({style:{fontSize:'10px',color:C.tealD,fontWeight:'700'}},'✓ Plaid verified')
+            )
+          )
+        )
+      )
+    : null;
+ 
+  const manualAccts = !B.plaidAssets ? div({},
+    div({style:{display:'flex',alignItems:'center',gap:'8px',margin:'13px 0',color:C.gray,fontSize:'12.5px'}},
+      div({style:{flex:'1',height:'1px',background:C.border}}),span({},'or enter manually'),div({style:{flex:'1',height:'1px',background:C.border}})
+    ),
+    ...['🏦|Checking|Chase Bank|42,800','💰|Savings|Chase Bank|28,500','📈|401(k)|Fidelity|89,200'].map(s => {
+      const [ico,t,inst,bal] = s.split('|');
+      return div({style:{display:'flex',gap:'10px',alignItems:'center',padding:'10px 12px',border:'1px solid '+C.border,borderRadius:'9px',marginBottom:'7px'}},
+        span({style:{fontSize:'16px',flexShrink:'0'}},ico),
+        div({style:{flex:'1',fontSize:'13px',fontWeight:'500'}},t+' · '+inst),
+        div({style:{fontWeight:'700',fontSize:'13px'}},'$'+bal)
+      );
+    })
+  ) : null;
+ 
+  return div({style:{maxWidth:'540px',margin:'0 auto',padding:'24px 16px 60px'}},
+    progBar(6,7),
+    qHead('Verify your assets','Show us your down payment funds','Connect your bank accounts for instant, paperless verification.'),
+    div({'class':'card',style:{marginBottom:'12px'}},
+      div({id:'plaid-assets-btn'}, plaidBtn(B.plaidAssets, connectPlaidAssets, 'Connect bank accounts with Plaid')),
+      accts,
+      manualAccts
+    ),
+    div({style:{display:'flex',gap:'10px',alignItems:'flex-start',padding:'12px 15px',background:C.purpleLL,borderRadius:'10px',border:'1px solid '+C.lavender,marginBottom:'12px'}},
+      span({style:{fontSize:'15px',flexShrink:'0'}},'ℹ️'),
+      p({style:{fontSize:'12.5px',color:C.dgray,lineHeight:'1.6'}},
+        el('strong',{},'Why we verify assets: '),
+        'Lenders confirm you have enough for the down payment ('+fmt(down)+') plus closing costs (est. '+fmt(Math.round(price*0.025))+'). Plaid is faster and more secure than uploading paper statements.'
+      )
+    ),
+    bNavRow(()=>{STATE.bStep=5;render();},()=>{STATE.bStep=7;render();},'Continue →',false)
+  );
+}
+ 
+// ─── Screen 7: Done ───────────────────────────────────────
+function bS7() {
+  const B = STATE.bData;
+  return div({style:{maxWidth:'460px',margin:'0 auto',padding:'36px 16px 60px',textAlign:'center'}},
+    div({style:{width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,'+C.purple+','+C.teal+')',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'30px',margin:'0 auto 18px'}},'🎉'),
+    h2({style:{fontSize:'28px',fontWeight:'800',marginBottom:'10px',letterSpacing:'-.01em'}},'Application submitted!'),
+    p({style:{fontSize:'14px',color:C.gray,lineHeight:'1.7',marginBottom:'22px'}},'Your loan officer will review your file and send your official Loan Estimate within 3 business days.'),
+    div({'class':'card',style:{textAlign:'left',marginBottom:'18px'}},
+      ...[['Application #','LN-2026-1001'],['Status','Under review'],['Next step','Official LE in 3 biz days'],['Income',B.plaidIncome?'✓ Plaid verified':'Manual entry'],['Assets',B.plaidAssets?'✓ Plaid verified':'Manual entry']].map(([l,v]) =>
+        div({style:{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'1px solid '+C.border,fontSize:'13px'}},
+          span({style:{color:C.gray}},l),
+          el('strong',{style:{color:v.includes('✓')?C.green:C.black}},v)
+        )
+      )
+    ),
+    btn({'class':'btn-primary',style:{width:'100%',padding:'13px',marginBottom:'8px'}},'Download Pre-Qual Letter'),
+    btn({'class':'btn-ghost',style:{width:'100%'},onClick:()=>{STATE.bStep=0;render();}},'Start Over')
+  );
+}
+ 
+// ═══════════════════════════════════════════════════════════
+//  LOAN OFFICER WORKBENCH
+// ═══════════════════════════════════════════════════════════
+function buildWorkbench() {
+  const loan = PIPELINE.find(l=>l.id===STATE.wbLoan)||PIPELINE[0];
+  const termYrs = loan.prod.includes('15')?15:30;
+  const pi  = calcPI(loan.loan,loan.rate,termYrs);
+  const tax = loan.val*0.0125/12, ins = loan.val*0.004/12;
+  const ltv = (loan.loan/loan.val)*100;
+  const pmi = (ltv>80&&!loan.prod.includes('VA'))?loan.loan*0.006/12:0;
+  const piti = pi+tax+ins+pmi;
+  const frontDTI = (piti/loan.inc)*100;
+  const backDTI  = ((piti+loan.dbt)/loan.inc)*100;
+  const L = {...loan,pi,tax,ins,pmi,piti,ltv,frontDTI,backDTI};
+ 
+  const wrap = div({style:{display:'flex',height:'calc(100vh - 48px)',overflow:'hidden'}});
+ 
+  // ── Sidebar ───────────────────────────────
+  const sidebar = div({style:{width:'260px',background:'#fff',borderRight:'1px solid '+C.border,display:'flex',flexDirection:'column',flexShrink:'0',overflow:'hidden'}});
+  sidebar.appendChild(div({style:{padding:'10px',borderBottom:'1px solid '+C.border,background:C.purpleLL}},
+    div({'class':'g3'},
+      ...[['8','Active'],['3','Closing <2w'],['1 🔴','Lock exp']].map(([v,l]) =>
+        div({style:{background:'#fff',borderRadius:'8px',padding:'7px 8px',textAlign:'center',border:'1px solid '+C.border}},
+          div({style:{fontWeight:'800',fontSize:'15px',color:l.includes('exp')?C.coral:C.purple}},v),
+          div({style:{fontSize:'9.5px',color:C.gray}},l)
+        )
+      )
+    )
+  ));
+  const loanList = div({style:{flex:'1',overflowY:'auto'}});
+  PIPELINE.forEach(l => {
+    const isSel = l.id===STATE.wbLoan;
+    const lockWarn = l.lock&&l.lock<=5;
+    const row = div({'class':'loan-row'+(isSel?' active':'')});
+    row.addEventListener('click',()=>{ STATE.wbLoan=l.id; STATE.wbTab='briefing'; render(); });
+    row.appendChild(div({style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'4px'}},
+      div({style:{display:'flex',gap:'7px',alignItems:'center'}},
+        div({style:{width:'26px',height:'26px',borderRadius:'50%',background:C.purple,color:'#fff',fontWeight:'800',fontSize:'10px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:'0'}},l.ini),
+        div({},
+          div({style:{fontWeight:'700',fontSize:'12.5px'}},l.bwr),
+          div({style:{fontSize:'10px',color:C.gray,fontFamily:'monospace'}},l.id)
+        )
+      ),
+      span({style:stageBadgeStyle(l.stage)},l.stage)
+    ));
+    row.appendChild(div({style:{display:'flex',justifyContent:'space-between'}},
+      span({style:{fontWeight:'700',fontSize:'12.5px',color:C.purple}},fmt(l.loan)),
+      span({style:{fontSize:'11px',color:C.gray}},l.prod)
+    ));
+    if (lockWarn) row.appendChild(div({style:{marginTop:'3px',fontSize:'10px',fontWeight:'700',color:'#dc2626',background:'#fef2f2',padding:'1px 6px',borderRadius:'4px',display:'inline-block'}},'🔴 Lock: '+l.lock+'d'));
+    if (l.plaid)  row.appendChild(div({style:{marginTop:'3px',fontSize:'9.5px',fontWeight:'700',color:C.tealD,background:C.tealL,padding:'1px 6px',borderRadius:'3px',display:'inline-block'}},'⚡ Plaid'));
+    loanList.appendChild(row);
+  });
+  sidebar.appendChild(loanList);
+  wrap.appendChild(sidebar);
+ 
+  // ── Main panel ────────────────────────────
+  const main = div({style:{flex:'1',display:'flex',flexDirection:'column',overflow:'hidden'}});
+ 
+  // Header
+  const header = div({style:{background:'#fff',borderBottom:'1px solid '+C.border,padding:'11px 16px',flexShrink:'0'}});
+  header.appendChild(div({style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'9px'}},
+    div({style:{display:'flex',gap:'10px',alignItems:'center'}},
+      div({style:{width:'38px',height:'38px',borderRadius:'50%',background:C.purple,color:'#fff',fontWeight:'800',fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center'}},L.ini),
+      div({},
+        div({style:{fontWeight:'800',fontSize:'15px'}},L.bwr),
+        div({style:{fontSize:'11px',color:C.gray,fontFamily:'monospace'}},L.id+' · '+L.prod+' · '+fmt(L.loan)+' · Close '+L.close)
+      )
+    ),
+    div({style:{display:'flex',gap:'6px',alignItems:'center'}},
+      L.plaid?span({style:{fontSize:'10.5px',fontWeight:'700',color:C.tealD,background:C.tealL,padding:'3px 8px',borderRadius:'6px'}},'⚡ Plaid'):null,
+      span({style:stageBadgeStyle(L.stage)},L.stage),
+      L.lock?span({style:{fontSize:'10.5px',fontWeight:'700',color:L.lock<=5?'#dc2626':L.lock<=14?C.orange:C.green,background:L.lock<=5?C.coralL:L.lock<=14?C.orangeL:C.greenL,padding:'3px 8px',borderRadius:'6px'}},'🔒 '+L.lock+'d lock'):null,
+      btn({'class':'btn-primary btn-sm'},'Move Stage →')
+    )
+  ));
+  // KPI strip
+  header.appendChild(div({style:{display:'flex',gap:'6px',marginBottom:'9px'}},
+    ...[[fmt(L.loan),'Loan',null],[pct(L.ltv),'LTV',L.ltv>90?C.coral:L.ltv>80?C.orange:C.green],[L.fico.toString(),'FICO',L.fico>=740?C.green:L.fico>=680?C.orange:C.coral],[pct(L.frontDTI),'Front DTI',L.frontDTI>31?C.orange:C.green],[pct(L.backDTI),'Back DTI',L.backDTI>50?C.coral:L.backDTI>45?C.orange:C.green],[fmt(Math.round(L.piti)),'PITI/mo',null]].map(([v,l,c]) =>
+      div({style:{background:C.bg,borderRadius:'7px',padding:'5px 9px',textAlign:'center',flex:'1',border:'1px solid '+C.border}},
+        div({style:{fontWeight:'800',fontSize:'13px',color:c||C.black}},v),
+        div({style:{fontSize:'9.5px',color:C.gray,marginTop:'1px'}},l)
+      )
+    )
+  ));
+  // Tabs
+  const tabBar = div({style:{display:'flex',borderBottom:'1px solid '+C.border,marginBottom:'-1px'}});
+  ['briefing|AI Briefing','actions|Actions','conditions|Conditions','freshness|Doc Freshness','calculator|Structuring'].forEach(s => {
+    const [id,label] = s.split('|');
+    const t = btn({'class':'stage-tab'+(STATE.wbTab===id?' active':'')}, label);
+    t.addEventListener('click',()=>{ STATE.wbTab=id; render(); });
+    tabBar.appendChild(t);
+  });
+  header.appendChild(tabBar);
+  main.appendChild(header);
+ 
+  // Tab content
+  const content = div({style:{flex:'1',overflowY:'auto',padding:'16px 16px 40px'},'class':'su'});
+  if (STATE.wbTab==='briefing')   content.appendChild(wbBriefing(L));
+  else if (STATE.wbTab==='actions')   content.appendChild(wbActions());
+  else if (STATE.wbTab==='conditions') content.appendChild(wbConditions(L));
+  else if (STATE.wbTab==='freshness') content.appendChild(wbFreshness());
+  else content.appendChild(wbCalculator(L));
+  main.appendChild(content);
+  wrap.appendChild(main);
+  return wrap;
+}
+ 
+function wbBriefing(L) {
+  const wrap = div({});
+  // Summary card
+  wrap.appendChild(div({style:{background:'linear-gradient(135deg,#211E1F,#3d1a3c)',borderRadius:'13px',padding:'16px 18px',color:'#fff',marginBottom:'13px'}},
+    div({style:{display:'flex',gap:'5px',marginBottom:'9px',flexWrap:'wrap'}},
+      ...['⚙️ Workflow','📚 RAG','📄 Doc'].map(a=>span({style:{fontSize:'10px',fontWeight:'700',padding:'2px 7px',borderRadius:'4px',background:'rgba(255,255,255,.12)',color:'#E0C6D9'}},a)),
+      span({style:{fontSize:'10px',color:'rgba(255,255,255,.3)',marginLeft:'auto'}},'Generated 8:00 AM today')
+    ),
+    div({style:{fontSize:'14px',fontWeight:'700',marginBottom:'3px'}},'AI Pre-Review — '+L.bwr),
+    p({style:{fontSize:'12.5px',color:'rgba(255,255,255,.55)',lineHeight:'1.6'}},'DU: Approve/Eligible · QM Safe Harbor · ATR verified · OFAC clear · Ready for underwriter review.')
+  ));
+  // 4-quadrant grid
+  wrap.appendChild(div({'class':'g2',style:{marginBottom:'13px'}},
+    ...[
+      {title:'Income', color:C.teal,  items:['$7,153/mo qualifying','Base + OT (2-yr avg ↑)','FNMA B3-3 W-2 method',...(L.plaid?['⚡ Plaid Income verified']:[])]},
+      {title:'Assets', color:C.blue,  items:['Total: $160,500','Liquid: $71,300','Down pmt: Chase ••4891',...(L.plaid?['⚡ Plaid Assets verified']:['⚠ $12,400 deposit LOE'])]},
+      {title:'Credit', color:C.purple,items:['742/738/745 — using 742','8 tradelines, 7.2yr avg','22% utilization','No derogatory']},
+      {title:'Collateral',color:C.orange,items:['Appraised: $425,000','CU Score 2.5 — low risk','3 strong comps in 0.5mi','C3 · No repairs required']},
+    ].map(sec =>
+      div({style:{background:'#fff',border:'1px solid '+C.border,borderRadius:'10px',padding:'12px 13px'}},
+        div({style:{fontWeight:'700',fontSize:'10.5px',color:sec.color,borderBottom:'2px solid '+sec.color,paddingBottom:'5px',marginBottom:'9px',textTransform:'uppercase',letterSpacing:'.04em'}},sec.title),
+        ...sec.items.map(item=>div({style:{fontSize:'12px',color:C.dgray,marginBottom:'3px',display:'flex',gap:'5px'}},
+          span({style:{color:item.startsWith('⚡')?C.teal:item.startsWith('⚠')?C.orange:C.gray,flexShrink:'0'}},'›'), item
+        ))
+      )
+    )
+  ));
+  // Risk flags
+  wrap.appendChild(div({'class':'card',style:{marginBottom:'11px'}},
+    div({style:{fontWeight:'700',fontSize:'12.5px',marginBottom:'9px'}},'⚠️ Risk flags requiring UW attention'),
+    div({'class':'flag-warn'},
+      span({style:{color:C.orange,fontWeight:'700',fontSize:'11px',flexShrink:'0'}},'🟡 WARN'),
+      div({style:{fontSize:'12px'}},'Back DTI '+pct(L.backDTI)+' > 45% — compensating factors: '+L.fico+' FICO, 8.4mo reserves, 4yr employment.')
+    ),
+    div({'class':'flag-info'},
+      span({style:{color:C.blue,fontWeight:'700',fontSize:'11px',flexShrink:'0'}},'🔵 INFO'),
+      div({style:{fontSize:'12px'}},'OT income trending ↑ 2 years. Eligible per FNMA B3-3.1-09.')
+    )
+  ));
+  // HITL
+  wrap.appendChild(div({'class':'hitl',style:{marginBottom:'11px'}},
+    div({style:{fontWeight:'700',fontSize:'11.5px',color:'#15803d',marginBottom:'2px'}},'✋ Human Gate: Underwriter Credit Decision'),
+    div({style:{fontSize:'11.5px',color:'#166534'}},'Agent pre-reviews — underwriter ALONE makes the credit decision.')
+  ));
+  // Decision buttons
+  wrap.appendChild(div({style:{display:'flex',gap:'7px'}},
+    ...['✅ Approve|#15803d|#dcfce7','⏳ Suspend|#b45309|#fef3e0','❌ Deny|#dc2626|#fef2f2'].map(s => {
+      const [l,c,bg]=s.split('|');
+      return btn({style:{flex:'1',padding:'10px',background:bg,border:'1.5px solid '+c+'44',borderRadius:'8px',fontWeight:'700',fontSize:'12px',color:c}},l);
+    }),
+    btn({style:{padding:'10px 13px',background:C.purpleL,border:'1px solid '+C.border,borderRadius:'8px',fontWeight:'600',fontSize:'12px',color:C.purple}},'+ Condition')
+  ));
+  return wrap;
+}
+ 
+function wbActions() {
+  const wrap = div({});
+  wrap.appendChild(div({style:{fontWeight:'800',fontSize:'16px',marginBottom:'3px'}},'Daily Prioritized Action List'));
+  wrap.appendChild(div({style:{fontSize:'12.5px',color:C.gray,marginBottom:'14px'}},'Generated 8:00 AM · '+PIPELINE.length+' active loans · sorted by urgency'));
+ 
+  const groups = [
+    {p:'P1',color:'#dc2626',bg:'#fef2f2',bd:'#fca5a5',label:'🔴 Critical — act today',items:[
+          {id:'a1',loan:'LN-2026-1006',bwr:'James Patel',text:'Rate lock expires in 2 days. Final VOE needed before Jun 13 closing.',type:'Rate Lock',auto:false,cta:'Extend Lock'},
+    ]},
+    {p:'P2',color:'#b45309',bg:'#fef3e0',bd:'#fde68a',label:'🟡 Auto-clearable — one click',items:[
+      {id:'b1',loan:'LN-2026-1001',bwr:'Sarah Chen',text:'VOE from Work Number matches UW condition C1 (Acme Corp). Confirm to clear?',type:'Condition',auto:true,cta:'Confirm & Clear'},
+      {id:'b2',loan:'LN-2026-1001',bwr:'Sarah Chen',text:'4506-C transcript matches 2024 & 2025 returns. No variance. Confirm?',type:'Condition',auto:true,cta:'Confirm Match'},
+    ]},
+    {p:'P3',color:'#0B89B5',bg:'#e0f5fb',bd:'#bfdbfe',label:'🔵 Borrower outreach needed',items:[
+      {id:'c1',loan:'LN-2026-1005',bwr:'Amanda Foster',text:'Bank statements outstanding 4 days. Pre-drafted SMS ready to send.',type:'Document',auto:true,cta:'Send Reminder'},
+    ]},
+    {p:'P4',color:'#6B6870',bg:'#F7F5FA',bd:'#E2D9E0',label:'⚪ Third-party pending',items:[
+      {id:'d1',loan:'LN-2026-1003',bwr:'Emily Rodriguez',text:'Appraisal ordered May 28 via Reggora. ETA Jun 5 — no update. Auto-follow-up sent.',type:'Appraisal',auto:false,cta:'Check Status'},
+    ]},
+  ];
+  groups.forEach(g => {
+    const groupEl = div({style:{marginBottom:'16px'}});
+    groupEl.appendChild(div({style:{fontSize:'10px',fontWeight:'800',color:g.color,textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'7px'}},g.label));
+    g.items.forEach(item => {
+      const done = STATE.wbCleared.has(item.id);
+      const row = div({style:{background:done?'#f9f9f9':g.bg,border:'1px solid '+(done?C.border:g.bd),borderRadius:'9px',padding:'10px 13px',marginBottom:'7px',display:'flex',gap:'10px',alignItems:'center',opacity:done?'0.55':'1',transition:'all .18s'}});
+      row.appendChild(div({style:{flex:'1'}},
+        div({style:{display:'flex',gap:'6px',alignItems:'center',marginBottom:'3px'}},
+          span({style:{fontFamily:'monospace',fontSize:'10px',fontWeight:'700',color:C.purple}},item.loan),
+          span({style:{fontWeight:'600',fontSize:'12px'}},item.bwr),
+          span({style:{fontSize:'9px',fontWeight:'700',padding:'1px 5px',borderRadius:'3px',background:C.neutral,color:C.dgray}},item.type)
+        ),
+        div({style:{fontSize:'12.5px',color:done?C.gray:C.dgray,lineHeight:'1.45'}},item.text)
+      ));
+      if (done) {
+        row.appendChild(span({style:{fontSize:'12px',fontWeight:'700',color:C.green,flexShrink:'0'}},'✓ Done'));
+      } else {
+        const b = btn({style:{padding:'7px 12px',background:item.auto?g.color:'#fff',color:item.auto?'#fff':g.color,border:'1.5px solid '+g.bd,borderRadius:'7px',fontSize:'11.5px',fontWeight:'700',cursor:'pointer',whiteSpace:'nowrap',flexShrink:'0'}},item.cta);
+        b.addEventListener('click',()=>{ STATE.wbCleared.add(item.id); render(); });
+        row.appendChild(b);
+      }
+      groupEl.appendChild(row);
+    });
+    wrap.appendChild(groupEl);
+  });
+  return wrap;
+}
+ 
+function wbConditions(L) {
+  const wrap = div({});
+  wrap.appendChild(div({style:{fontWeight:'800',fontSize:'16px',marginBottom:'13px'}},'Conditions — '+L.bwr));
+  const grid = div({style:{display:'flex',gap:'11px'}});
+  [
+    {status:'Satisfied',color:'#61C16F',bg:'#f0fdf4',conds:[{id:'C2',text:'4506-C transcript matches 2024 & 2025 returns',doc:'IRS 4506-C',date:'Jun 8'},{id:'C6',text:'Identity verified — OFAC clear',doc:'LexisNexis',date:'May 28'}]},
+    {status:'Pending',color:'#EF9D65',bg:'#fffbeb',conds:[{id:'C1',text:'Verify employment within 10 biz days of closing',doc:'VOE Work Number',date:'Due Jun 13'},{id:'C3',text:'Updated pay stub within 30 days of closing',doc:'Recent pay stub',date:'Due Jun 12'},{id:'C4',text:"Homeowner's insurance binder with lender clause",doc:'Insurance binder',date:'Due Jun 13'}]},
+    {status:'Borrower needed',color:'#954892',bg:'#faf5fb',conds:[{id:'C5',text:'Final title commitment — no exceptions',doc:'Title commitment',date:'In progress'},{id:'C7',text:'LOE for $12,400 deposit on 2/15',doc:'LOE + support docs',date:'Under review'}]},
+  ].forEach(col => {
+    const colEl = div({style:{flex:'1'}});
+    colEl.appendChild(div({style:{display:'flex',alignItems:'center',gap:'5px',fontWeight:'700',fontSize:'10.5px',color:col.color,textTransform:'uppercase',letterSpacing:'.05em',marginBottom:'8px'}},
+      col.status, span({style:{background:col.bg,color:col.color,borderRadius:'10px',padding:'1px 7px',fontSize:'10px'}},col.conds.length)
+    ));
+    col.conds.forEach(c => {
+      colEl.appendChild(div({class:'cond-card'},
+        div({style:{display:'flex',justifyContent:'space-between',marginBottom:'3px'}},
+          span({style:{fontFamily:'monospace',fontWeight:'700',fontSize:'11px',color:col.color}},c.id),
+          span({style:{fontSize:'10.5px',color:'#6B6870'}},c.date)
+        ),
+        div({style:{fontSize:'12px',fontWeight:'500',color:'#211E1F',marginBottom:'3px',lineHeight:'1.45'}},c.text),
+        div({style:{fontSize:'11px',color:'#6B6870'}},c.doc)
+      ));
+    });
+    grid.appendChild(colEl);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+ 
+function wbFreshness() {
+  const wrap = div({});
+  wrap.appendChild(div({style:{fontWeight:'800',fontSize:'16px',marginBottom:'3px'}},'Document Freshness Monitor'));
+  wrap.appendChild(p({style:{fontSize:'12.5px',color:C.gray,marginBottom:'14px'}},'Proactive alerts — never discover expired docs the day before closing.'));
+  [
+    {doc:'Credit Report',date:'Feb 4',exp:'Jun 4 (120-day window)',days:22,val:120,status:'ok'},
+    {doc:'Pay Stub (most recent)',date:'May 31',exp:'Jun 30 (30-day window)',days:18,val:30,status:'ok'},
+    {doc:'Bank Statement (April)',date:'May 3',exp:'Jun 2 (60-day window)',days:6,val:60,status:'warn'},
+    {doc:'VOE — Work Number',date:'—',exp:'Within 10 biz days of close',days:null,val:null,status:'pending'},
+    {doc:"Homeowner's Insurance Binder",date:'—',exp:'Must be effective on close date',days:null,val:null,status:'missing'},
+    {doc:'Flood Certification',date:'May 10',exp:'Life of loan',days:999,val:null,status:'ok'},
+    {doc:'Appraisal',date:'May 14',exp:'May 2027 (12-month window)',days:337,val:365,status:'ok'},
+  ].forEach(d => {
+    const barPct = d.days&&d.days<999&&d.val ? Math.round(Math.max(0,Math.min(100,(d.days/d.val)*100))) : null;
+    const clr = d.status==='missing'?C.coral:(d.status==='warn'||(d.days&&d.days<=7))?C.orange:d.status==='pending'?C.blue:C.green;
+    const row = div({class:'fresh-row',style:{borderColor:d.status==='missing'?C.coral:d.status==='warn'?C.orange:C.border}});
+    row.appendChild(div({style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:barPct!=null?'7px':'0'}},
+      div({},
+        div({style:{fontWeight:'600',fontSize:'13px'}},d.doc),
+        div({style:{fontSize:'11px',color:C.gray,marginTop:'2px'}},(d.date!=='—'?'Pulled '+d.date+' · ':'')+d.exp)
+      ),
+      div({style:{flexShrink:'0',marginLeft:'11px',textAlign:'right'}},
+        d.days!=null&&d.days<999
+          ? div({style:{fontWeight:'800',fontSize:'17px',color:d.days<=7?C.coral:d.days<=14?C.orange:C.green}},d.days+'d')
+          : span({style:{fontSize:'11px',fontWeight:'700',color:clr,padding:'2px 8px',borderRadius:'6px',background:d.status==='missing'?C.coralL:d.status==='pending'?C.blueL:C.greenL}},
+              d.status==='ok'?'✓ Valid':d.status==='pending'?'⏳ Pending':'❌ Missing')
+      )
+    ));
+    if (barPct!=null) {
+      row.appendChild(div({style:{height:'5px',background:C.neutral,borderRadius:'3px',overflow:'hidden'}},
+        div({style:{height:'100%',width:barPct+'%',background:barPct<15?C.coral:barPct<30?C.orange:C.green,borderRadius:'3px'}})
+      ));
+    }
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+ 
+function wbCalculator(L) {
+  const wrap = div({});
+  wrap.appendChild(div({style:{fontWeight:'800',fontSize:'16px',marginBottom:'3px'}},'Loan Structuring Calculator'));
+  wrap.appendChild(p({style:{fontSize:'12.5px',color:C.gray,marginBottom:'14px'}},'Model scenarios side-by-side to find the best structure.'));
+  wrap.appendChild(div({class:'g2'},
+    ...[{label:'Current — 30-Yr Fixed',prod:PRODS[0]},{label:'Alternative — FHA 30-Yr',prod:PRODS[2]}].map(sc => {
+      const tYrs=sc.prod.term, pi=calcPI(L.loan,sc.prod.rate,tYrs);
+      const tax=L.val*0.0125/12, ins=L.val*0.004/12;
+      const ltv=(L.loan/L.val)*100;
+      const pmi=(sc.prod.pmi&&ltv>80)?L.loan*0.006/12:0;
+      const mip=sc.prod.mip?L.loan*0.0055/12:0;
+      const piti=pi+tax+ins+pmi+mip;
+      const backDTI=((piti+L.dbt)/L.inc)*100;
+      const totalInt=Math.round(pi*tYrs*12-L.loan);
+      const card=div({class:'card'});
+      card.appendChild(div({style:{fontWeight:'800',fontSize:'13px',color:C.purple,marginBottom:'3px'}},sc.label));
+      card.appendChild(div({style:{fontWeight:'700',fontSize:'18px',marginBottom:'12px'}},sc.prod.rate+'% ',span({style:{fontSize:'12px',color:C.gray,fontWeight:'400'}},'interest rate')));
+      const rows=[['P&I',fmt(Math.round(pi)),null],['Tax & insurance',fmt(Math.round(tax+ins)),null]];
+      if(pmi>0)rows.push(['PMI',fmt(Math.round(pmi)),null]);
+      if(mip>0)rows.push(['FHA MIP',fmt(Math.round(mip)),null]);
+      rows.push(['Total PITI',fmt(Math.round(piti)),C.purple],['Back DTI',pct(backDTI),backDTI>45?C.orange:C.green],['Total interest',fmt(totalInt),null]);
+      rows.forEach(([l,v,c])=>{
+        card.appendChild(div({style:{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px dashed '+C.border,fontSize:'12.5px'}},
+          span({style:{color:C.gray}},l), el('strong',{style:{color:c||C.black}},v)
+        ));
+      });
+      card.appendChild(div({style:{marginTop:'9px',padding:'7px 10px',background:backDTI>50?C.coralL:backDTI>45?C.orangeL:C.greenL,borderRadius:'7px',fontSize:'12px',fontWeight:'700',color:backDTI>50?C.coral:backDTI>45?C.orange:C.green}},
+        'DTI '+pct(backDTI)+' — '+(backDTI>50?'❌ Exceeds limit':backDTI>45?'⚠ Needs comp factors':'✓ Within guideline')
+      ));
+      return card;
+    })
+  ));
+  return wrap;
+}
+ 
+function buildPipeline() {
+  const rows=PIPELINE.map(l=>{
+    const tYrs=l.prod.includes('15')?15:30;
+    const pi=calcPI(l.loan,l.rate,tYrs), piti=pi+l.val*0.0167/12;
+    const ltv=(l.loan/l.val)*100, backDTI=((piti+l.dbt)/l.inc)*100;
+    return{...l,ltv,backDTI};
+  });
+  const stages=['All','Pre-Qual','Application','Disclosure','Documents','Processing','Underwriting','Conditions','Closing'];
+  const filtered=STATE.pipeFilter==='All'?rows:rows.filter(l=>l.stage===STATE.pipeFilter);
+  const totalVol=PIPELINE.reduce((s,l)=>s+l.loan,0);
+  const avgFico=Math.round(PIPELINE.reduce((s,l)=>s+l.fico,0)/PIPELINE.length);
+  const lockAlerts=PIPELINE.filter(l=>l.lock&&l.lock<=7).length;
+  const wrap=div({style:{padding:'14px',background:C.bg}});
+  wrap.appendChild(div({class:'g4',style:{marginBottom:'14px'}},
+    ...[[PIPELINE.length,'Active loans','📋',null],[fmt(totalVol),'Total volume','💰',null],[avgFico.toString(),'Avg FICO','📊',null],[lockAlerts>0?lockAlerts+' ⚠':'✓ None','Lock alerts','🔒',lockAlerts>0?C.coral:C.green]].map(([v,l,icon,c])=>
+      div({style:{background:'#fff',border:'1px solid '+C.border,borderRadius:'11px',padding:'13px 14px'}},
+        div({style:{display:'flex',justifyContent:'space-between',marginBottom:'5px'}},div({style:{fontSize:'11.5px',color:C.gray,fontWeight:'600'}},l),span({style:{fontSize:'16px'}},icon)),
+        div({style:{fontSize:'24px',fontWeight:'800',color:c||C.black}},v)
+      )
+    )
+  ));
+  const fr=div({style:{display:'flex',gap:'6px',marginBottom:'12px',flexWrap:'wrap'}});
+  stages.forEach(s=>{
+    const b=btn({style:{padding:'5px 12px',border:'1.5px solid '+(STATE.pipeFilter===s?C.purple:C.border),borderRadius:'20px',fontSize:'12px',fontWeight:STATE.pipeFilter===s?'700':'400',background:STATE.pipeFilter===s?C.purpleLL:'#fff',color:STATE.pipeFilter===s?C.purple:C.dgray,cursor:'pointer'}},s);
+    b.addEventListener('click',()=>{STATE.pipeFilter=s;render();});
+    fr.appendChild(b);
+  });
+  wrap.appendChild(fr);
+  const tw=div({style:{background:'#fff',border:'1px solid '+C.border,borderRadius:'13px',overflow:'auto'}});
+  const table=el('table',{style:{minWidth:'780px'}});
+  table.appendChild(el('thead',{},el('tr',{},...['Borrower','Loan #','Product','Amount','LTV','FICO','Back DTI','Stage','Lock','Close','Plaid'].map(h=>el('th',{},h)))));
+  const tbody=el('tbody',{});
+  filtered.forEach(l=>{
+    const row=el('tr',{});
+    [el('td',{style:{fontWeight:'600'}},l.bwr),el('td',{},span({style:{fontFamily:'monospace',fontSize:'10.5px',color:C.purple,fontWeight:'700'}},l.id)),el('td',{style:{fontSize:'11.5px',color:C.dgray}},l.prod),el('td',{style:{fontWeight:'700'}},fmt(l.loan)),el('td',{style:{fontWeight:'700',color:l.ltv>90?C.coral:l.ltv>80?C.orange:C.green}},pct(l.ltv)),el('td',{style:{fontWeight:'700',color:l.fico>=740?C.green:l.fico>=680?C.orange:C.coral}},l.fico),el('td',{style:{fontWeight:'700',color:l.backDTI>50?C.coral:l.backDTI>45?C.orange:C.green}},pct(l.backDTI)),el('td',{},span({style:stageBadgeStyle(l.stage)},l.stage)),el('td',{},l.lock?span({style:{fontWeight:'700',fontSize:'11px',color:l.lock<=5?'#dc2626':l.lock<=14?C.orange:C.green}},'🔒 '+l.lock+'d'):span({style:{color:C.gray}},'—')),el('td',{style:{fontSize:'12px',fontWeight:'600'}},l.close),el('td',{},l.plaid?span({style:{fontSize:'10px',fontWeight:'700',color:C.tealD,background:C.tealL,padding:'2px 6px',borderRadius:'4px'}},'⚡'):'—')].forEach(c=>row.appendChild(c));
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  tw.appendChild(table);
+  wrap.appendChild(tw);
+  return wrap;
+}
+ 
+render();
+ 
+// ═══════════════════════════════════════════════════════════
+//  AGENT OVERLAY DATA
+// ═══════════════════════════════════════════════════════════
+const AGENT_DATA = {
+  // ── Borrower screens (keyed by bStep) ──
+  b0: {
+    title: 'B1.1 — Initial Engagement & Landing',
+    agents: [
+      {type:'voice', label:'Voice Agent', action:'Answers inbound mortgage line calls using CU-branded voice persona. Detects loan purpose (purchase / refi / cash-out) through natural conversation and routes to correct workflow.'},
+      {type:'chat',  label:'Chat Agent',  action:'Simultaneously available on website, mobile app, and SMS. Same conversational flow in text. Detects intent and routes to mortgage workflow.'},
+      {type:'ui',    label:'UI Agent',    action:'Renders white-labeled application portal dynamically. Adapts form fields, product options, and disclosures to the specific loan type selected.'},
+      {type:'workflow',label:'Workflow Agent',action:'Detects channel (SIP/PSTN, WebSocket, SMS, mobile SDK), routes borrower to correct path, and escalates to human MLO on complex scenarios or upon borrower request.'},
+    ],
+    hitl: 'Not required at this step. If borrower requests a human, agent immediately warm-transfers with full context summary.',
+    apis: ['Channel: SIP/PSTN, WebSocket, Twilio SMS, Mobile SDK','PPE — live rate queries (Optimal Blue / Polly)','Core CIF — existing member pre-fill'],
+    compliance: [],
+    steps: ['B1.1']
+  },
+  b1: {
+    title: 'B1.3 — Needs Assessment & Scenario Building',
+    agents: [
+      {type:'chat',  label:'Chat Agent',  action:'Conducts structured needs assessment: loan purpose, property type, occupancy, purchase price, down payment source, income type, estimated debts, credit awareness, and timeline — through natural conversation.'},
+      {type:'voice', label:'Voice Agent', action:'Same needs assessment flow delivered over a phone call with natural language understanding and real-time follow-up questions.'},
+      {type:'rag',   label:'RAG Agent',   action:'Simultaneously queries CU loan product matrix (conventional, FHA, VA, USDA, jumbo, portfolio, DPA programs) to identify eligible products from borrower answers. Returns top 2–3 options with estimated rates and payments.'},
+      {type:'ui',    label:'UI Agent',    action:'Renders real-time affordability calculator as borrower provides inputs. Shows estimated P&I, taxes, insurance, PMI, total PITI, and max qualifying purchase price.'},
+      {type:'workflow',label:'Workflow Agent',action:'Validates each section in real-time for completeness, flags inconsistencies (e.g. stated income misaligned with employment type), calculates preliminary DTI.'},
+    ],
+    hitl: 'Not required (informational). Complex scenarios — self-employed, non-QM, foreign national, non-warrantable condo — flagged to MLO for consultation.',
+    apis: ['PPE — real-time rate quotes per FICO + LTV','RAG index: CU product guidelines, DPA eligibility, investor overlays'],
+    compliance: ['Reg B §1002.4 — cannot discourage application','Fair lending — identical treatment regardless of protected class'],
+    steps: ['B1.3']
+  },
+  b2: {
+    title: 'B2.1 — Digital Application (URLA 1003)',
+    agents: [
+      {type:'ui',    label:'UI Agent',    action:'Renders dynamic mobile-responsive 1003 form pre-populated with data from B1. For existing members: pre-fills employment, accounts, and existing loan data from core CIF.'},
+      {type:'chat',  label:'Chat Agent',  action:'Sidebar companion — answers borrower questions in real-time ("What counts as other income?", "Do I list my 401(k)?") by querying RAG Agent against FNMA Selling Guide and CU policies.'},
+      {type:'rag',   label:'RAG Agent',   action:'Answers application help questions. Cites specific Fannie Mae Selling Guide, FHA Handbook, or CU policy sections for every answer.'},
+      {type:'workflow',label:'Workflow Agent',action:'Validates each section as borrower types: checks completeness, flags inconsistencies, calculates preliminary DTI. Application auto-saves — borrower can return later.'},
+    ],
+    hitl: 'Not required at this step. Application data entry is borrower-driven. All data subject to underwriting review.',
+    apis: ['Core CIF pre-fill — name, SSN, employment, accounts','eConsent capture — E-Sign Act / UETA'],
+    compliance: ['HMDA Reg C — race, ethnicity, sex collected for government monitoring','E-SIGN Act / UETA — eConsent for electronic disclosures'],
+    steps: ['B2.1']
+  },
+  b3: {
+    title: 'B1.4 + B2.1 — Identity Verification & Contact Collection',
+    agents: [
+      {type:'workflow',label:'Workflow Agent',action:'Determines authentication path: Path A (existing member — SSN + DOB + OTP via SMS) or Path B (new applicant — full identity verification flow).'},
+      {type:'web',   label:'Web Agent',   action:'Path B: calls LexisNexis InstantID or Experian Precise ID in real-time. Validates SSN against SSA records. Performs OFAC/SDN screening. Checks for synthetic identity fraud flags and SSN misuse alerts.'},
+      {type:'ui',    label:'UI Agent',    action:'Renders identity verification flow for new applicants: legal name, SSN, DOB, current address. Presents KBA challenge questions if required.'},
+      {type:'chat',  label:'Chat Agent',  action:'Guides borrower through identity verification steps, explains why each piece of information is needed, and provides reassurance about data security.'},
+    ],
+    hitl: 'Required if identity verification fails, OFAC potential match triggered, or fraud alert fires. Agent pauses workflow and escalates to BSA/compliance staff. Only a human can make the denial determination.',
+    apis: ['LexisNexis InstantID / Experian Precise ID / Socure','SSA eCBSV — SSN validation','OFAC SDN screening (LexisNexis Bridger)','Twilio / Bandwidth — OTP delivery'],
+    compliance: ['CIP 31 CFR §1020.220 — verify name, DOB, address, SSN','OFAC strict liability — screen before establishing relationship','Reg B / ECOA — cannot discourage on prohibited basis'],
+    steps: ['B1.2', 'B2.1']
+  },
+  b4: {
+    title: 'B1.4 + B2.2 — Income Verification & Document Collection',
+    agents: [
+      {type:'chat',  label:'Chat Agent',  action:'Obtains explicit consent for soft credit inquiry with timestamp and device capture. Presents personalized doc checklist based on employment type (W-2 → W-2s + paystubs; self-employed → 1040s + K-1s + P&Ls).'},
+      {type:'workflow',label:'Workflow Agent',action:'Triggers soft credit pull on consent. Activates Document Freshness Monitor — tracks validity windows for every document (paystubs 30d, bank stmts 60d, credit report 120d). Sends SMS/email reminders for missing docs.'},
+      {type:'web',   label:'Web Agent',   action:'Calls CRA API for soft tri-merge pull returning FICO scores, tradelines, utilization, derogatory marks, and monthly obligations. If Plaid connected: pulls VOI (income) and VOE (employment) directly.'},
+      {type:'doc',   label:'Doc Agent',   action:'Processes each uploaded document in real-time: classifies type, extracts key fields, validates date windows, cross-references against application data, runs fraud detection (pixel analysis, font inconsistency, known fraudulent paystub generators).'},
+      {type:'rag',   label:'RAG Agent',   action:'Recalculates product eligibility with actual credit data. Applies FNMA B3-3 income calculation rules. Generates pre-qualification letter if borrower qualifies.'},
+    ],
+    hitl: 'Required if: borrower doesn\'t qualify for any product (MLO handles); fraud flag triggered (quarantine + BSA alert); document confidence < 95% (routes to processor); pre-qual letter issuance (MLO reviews and approves draft before delivery).',
+    apis: ['CRA soft pull: CoreLogic Credco / MeridianLink MCL / Factual Data','Plaid / Finicity — VOA / VOI / VOE (direct bank + employer data)','Equifax Work Number / Truework — employment verification'],
+    compliance: ['FCRA §604 — permissible purpose for soft pull; consent with timestamp','Reg B — pre-qual denial requires Adverse Action Notice (human decision)'],
+    steps: ['B1.4', 'B2.2']
+  },
+  b5: {
+    title: 'B1.4 + B1.5 — Pre-Qual Results & Competitive Offer Package',
+    agents: [
+      {type:'doc',   label:'Doc Agent',   action:'Generates CU-branded pre-qualification letter (PDF): borrower name, pre-qualified amount, estimated rate range, product type, 90-day validity period, required disclaimers ("subject to full underwriting review, appraisal, and property eligibility").'},
+      {type:'rag',   label:'RAG Agent',   action:'Applies program-specific eligibility rules for each product displayed. For TBD approval: validates file is 100% clear with no outstanding prior-to-approval conditions. Generates Buyer Strength Summary for listing agent (verified FICO range, DTI, employment — no PII).'},
+      {type:'workflow',label:'Workflow Agent',action:'Triggers Competitive Offer Package workflow for hot-market borrowers: full TBD underwriting approval before property is identified. Orchestrates TBD disclosure packet generation and tracks outstanding conditions.'},
+      {type:'voice', label:'Voice Agent', action:'MLO option: agent prepares call brief and talking points for listing agent outreach. Can make initial outbound call with warm-transfer to MLO, or MLO calls directly with the prepared brief.'},
+    ],
+    hitl: 'Required: MLO reviews and approves pre-qual letter before delivery. Required for TBD approval: underwriter must have cleared the file with no outstanding PTA conditions. MLO approves offer letter and buyer strength summary.',
+    apis: ['PPE re-query with actual FICO score','Doc generation engine — CU-branded PDF output'],
+    compliance: ['GLBA / privacy — no sensitive PII in listing agent materials','Reg B — Adverse Action Notice required if denied (human delivers)'],
+    steps: ['B1.4', 'B1.5']
+  },
+  b6: {
+    title: 'B2.2 + B2.3 — Asset Verification & Document Chasing',
+    agents: [
+      {type:'doc',   label:'Doc Agent',   action:'Processes bank statements: extracts account holder, account number, statement period, balances, large deposits (flags those requiring LOE), payroll deposit patterns, NSF/overdraft events. Fraud-checks all uploaded docs.'},
+      {type:'web',   label:'Web Agent',   action:'If borrower connects Plaid/Finicity: pulls VOA (Verification of Assets) report directly — eliminates paper bank statements. Also pulls VOI (income verification) and VOE (employment) if available.'},
+      {type:'workflow',label:'Workflow Agent',action:'Tracks all checklist items. Runs Document Freshness Monitor continuously: tracks expiry for every document. Proactively triggers re-collection 7 days before any document expires — no more discovering expired paystubs the day before closing.'},
+      {type:'chat',  label:'Chat Agent',  action:'Sends personalized reminders via SMS/email/in-app on Days 1, 3, 5: "Hi Sarah, we\'re still waiting for your April bank statement. Upload here: [link]."'},
+      {type:'voice', label:'Voice Agent', action:'Makes outbound call on Day 5+ if SMS/email reminders are unresponsive: "Hi Sarah, I\'m following up on your application — we just need your most recent bank statement. Would you like to connect your Chase account directly?"'},
+    ],
+    hitl: 'Not required for routine doc chasing (operational). Escalates to MLO if borrower unresponsive 10+ days. Fraud flags route to processor + BSA team immediately.',
+    apis: ['Plaid / Finicity / Yodlee — VOA / VOI / VOE direct bank connection','Twilio / SendGrid — SMS/email delivery','Outbound voice: SIP trunk with CU caller ID'],
+    compliance: ['FCRA §607 — reasonable procedures to ensure consumer data accuracy','FNMA B3-3.1-01 — income docs must be no more than 120 days old at note date'],
+    steps: ['B2.2', 'B2.3', 'B2.4']
+  },
+  b7: {
+    title: 'B4.3 — Post-Submission & Application Status',
+    agents: [
+      {type:'chat',  label:'Chat Agent',  action:'Sends proactive status updates at every milestone: "Your appraisal came in at $425,000 — great news! Moving to underwriting now. Estimated timeline: 3–5 business days." Translates UW conditions to plain English for borrower.'},
+      {type:'ui',    label:'UI Agent',    action:'Provides borrower-facing status dashboard: visual pipeline (Application → Processing → Underwriting → Conditional Approval → CTC → Closing → Funded), stage ETA, borrower action items, and completed milestones.'},
+      {type:'voice', label:'Voice Agent', action:'Available 24/7 for status inquiries: "What\'s the status of my loan?", "What do you still need from me?", "When is my closing date?". Pulls real-time data from LOS — answers always grounded in actual file data.'},
+      {type:'workflow',label:'Workflow Agent',action:'After closing: triggers NPS/CSAT survey 7 days post-close. Orchestrates investor delivery (FNMA/FHLMC ULDD), eRecording via Simplifile, MERS registration, and loan boarding to core banking + servicing platform.'},
+      {type:'doc',   label:'Doc Agent',   action:'Post-close automated QC checklist: verifies all documents in file, all signatures present, dates consistent, HMDA data accurate, regulatory disclosures complete. Packages ULDD data file for investor delivery.'},
+    ],
+    hitl: 'Status updates are automated (informational). Escalates to MLO if borrower expresses frustration, urgency, or complaint — with full context and sentiment summary. Post-close: 10% random QC sample requires full human re-review per FNMA Selling Guide D1.',
+    apis: ['LOS (Encompass / MeridianLink / nCino) — real-time pipeline status','Push notifications: SMS + email + in-app at each milestone','Simplifile — eRecording','MERS eRegistry — MIN assignment','FNMA Loan Delivery (ULDD) / FHLMC Loan Selling Advisor'],
+    compliance: ['FNMA Selling Guide D1 — 10% QC sample post-close','HMDA LAR — annual submission validation'],
+    steps: ['B3.3', 'B4.3', 'I4.1', 'I4.2']
+  },
+  // ── Workbench tabs ──
+  wb_briefing: {
+    title: 'I3.1 — AI Pre-Review & Risk Flag Summary',
+    agents: [
+      {type:'workflow',label:'Workflow Agent',action:'Prepares complete underwriting package for human review. Pulls all loan data from LOS, assembles documents, and orchestrates the pre-review generation. Routes decision downstream: Conditional Approval → triggers borrower outreach + third-party ordering; Suspended → notifies processor + MLO only; Denied → generates Adverse Action Notice draft for MLO review.'},
+      {type:'rag',   label:'RAG Agent',   action:'Generates Underwriting Pre-Review Summary — a single-page executive brief covering: loan summary, income analysis, asset analysis, credit analysis, collateral summary, risk flags, and conditions status. Applies loan-type-specific rules: FHA (flip rule, MIP, community property), VA (COE verification, funding fee, MPRs), USDA (geographic eligibility, income limits), Conventional (PMI threshold, seller concession limits). Every cited number links to the source document and page.'},
+      {type:'doc',   label:'Doc Agent',   action:'Performs automated compliance checks: TRID tolerance (LE vs. CD comparison), HMDA data accuracy, QM/ATR safe harbor verification (DTI within limits, no negative amortization, loan term ≤30 years, points and fees within 3% threshold).'},
+    ],
+    hitl: 'Underwriter is the SOLE credit decision maker. Agent never approves, suspends, or denies. Underwriter reviews every document and validates every data point — the pre-review is a starting point, not a substitute for underwriter judgment. Adverse Action Notice requires MLO review before delivery to borrower.',
+    apis: ['FNMA Collateral Underwriter (CU) score — appraisal risk','LexisNexis FraudGuard — identity + fraud verification','OFAC/SDN re-screening (required before closing)'],
+    compliance: ['ATR/QM: Reg Z §1026.43 — Ability to Repay verification','HMDA: Reg C — data accuracy before submission','ECOA/Reg B §1002.9 — Adverse Action Notice within 30 days'],
+    steps: ['I3.1', 'I3.2']
+  },
+  wb_actions: {
+    title: 'I2.0 — Daily Prioritized Action List',
+    agents: [
+      {type:'workflow',label:'Workflow Agent',action:'Generates the Daily Prioritized Action List for each processor overnight. Rank-orders by urgency: P1 (expiring 48h — rate locks, doc windows, closing dates with open conditions), P2 (auto-clearable — conditions matched to documents already in file), P3 (borrower outreach — missing docs with pre-drafted messages), P4 (third-party pending — appraisals, title, flood certs, transcripts). Eliminates the 30–60 min manual triage processors spend every morning opening every file.'},
+      {type:'rag',    label:'RAG Agent',    action:'Enriches each action item with context: flags approaching rate lock expiry, complex income scenarios, first-time homebuyer nuances. Auto-matches AUS conditions to documents already uploaded — presents one-click processor confirmation rather than manual search across 200+ documents per file.'},
+      {type:'ui',    label:'UI Agent',      action:'Renders the action list as an interactive dashboard. Processor can expand any item, click to open the file, approve auto-clearances, send borrower outreach, or reassign to another processor. Shows real-time pipeline stats: total files, files in UW, files pending conditions, projected closings this week.'},
+    ],
+    hitl: 'Processor reviews top-down and validates every recommendation. Agent sorts, matches, and drafts — processor approves. Processor can override any priority ranking at any time with documented rationale.',
+    apis: ['LOS workflow engine — condition tracking + document matching','Twilio / SendGrid — pre-drafted outreach delivery on approval'],
+    compliance: [],
+    steps: ['I2.0']
+  },
+  wb_conditions: {
+    title: 'I2.3 + B4.1 — AUS Conditions Mapping & Resolution',
+    agents: [
+      {type:'workflow',label:'Workflow Agent',action:'Packages loan data in MISMO XML and submits to Fannie Mae DU or Freddie Mac LPA. Receives AUS findings. Builds prioritized conditions tracker with deadlines calibrated to target closing date. Auto-checks off conditions as documents are uploaded and validated. Sends borrower reminders for outstanding items.'},
+      {type:'rag',    label:'RAG Agent',    action:'Parses AUS conditions and maps each to: (a) a document already collected and auto-satisfies if on file, (b) a document needed from borrower — triggers Chat Agent outreach, or (c) a third-party verification to order — triggers Web Agent. Validates each condition against FNMA Selling Guide, FHA 4000.1, or VA Handbook.'},
+      {type:'doc',   label:'Doc Agent',    action:'Auto-generates templated documents for conditions where possible: gift letter template (pre-filled with borrower name, donor name, amount), LOE (Letter of Explanation) template, authorization forms. Validates format and completeness of borrower-submitted condition responses.'},
+      {type:'chat',  label:'Chat Agent',   action:'Translates underwriter conditions into plain English for borrower: instead of "Provide LOE for 2/15/25 deposit of $12,400 to Chase account ending 4521" — borrower sees "We noticed a $12,400 deposit on Feb 15th. Can you tell us where that came from?"'},
+    ],
+    hitl: 'Processor reviews each condition response before marking as satisfied. Agent collects and validates format/completeness — human processor confirms the condition is actually met (e.g., the gift letter has the right donor, the LOE is credible). AUS Refer/Caution or Ineligible: processor and MLO determine path forward — agent cannot make this determination.',
+    apis: ['FNMA DU / FHLMC LPA — MISMO XML AUS submission','AUS returns: Approve/Eligible, Refer/Caution, Ineligible + conditions list'],
+    compliance: ['FNMA Selling Guide B3-2-01 — AUS decision review','Reg B — processor cannot deny based on AUS alone if manual underwriting is possible'],
+    steps: ['I2.3', 'B4.1']
+  },
+  wb_freshness: {
+    title: 'B2.4 — Document Freshness Monitor (Continuous)',
+    agents: [
+      {type:'workflow',label:'Workflow Agent',action:'Runs a continuous Document Freshness Monitor across all active files. Tracks validity windows for every document type and proactively triggers re-collection BEFORE expiry: pay stubs alert at Day 23 (7 days before 30-day expiry), bank statements alert at Day 50 (10 days before 60-day expiry), credit report alerts at Day 100 (20 days before 120-day expiry), VOE auto-ordered at T-12 business days from closing.'},
+      {type:'chat',  label:'Chat Agent',   action:'Sends proactive re-collection requests to borrower 7 days before any document expires: "Hi Sarah, your pay stub from April 15 will expire on May 15. Can you upload your most recent pay stub? Just take a photo and upload here: [link]." Eliminates discovering expired documents the day before closing.'},
+    ],
+    hitl: 'Not required for standard re-collection (agent handles proactively). Required if: critical document (credit report, appraisal) is about to expire and closing cannot occur before expiry — processor and MLO must decide whether to re-pull credit or request appraisal update.',
+    apis: ['LOS document registry — validity window tracking','Twilio — automated re-collection SMS/email','Equifax Work Number — auto-ordered final VOE at T-12 business days'],
+    compliance: ['FNMA B1-1-03 — credit report valid 120 days','FNMA B3-3.1-01 — income docs no more than 120 days old at note date','FNMA B3-3.1-07 — final VOE within 10 business days of note date'],
+    steps: ['B2.4']
+  },
+  wb_calculator: {
+    title: 'I1.2 — Scenario Structuring for Complex Deals',
+    agents: [
+      {type:'rag',   label:'RAG Agent',   action:'Answers complex structuring questions in natural language: "Can this borrower use rental income from their investment property to qualify?" Agent searches FNMA Selling Guide B3-3 and returns the specific guideline answer with section citation. Covers: self-employed income calculation, non-occupant co-borrower eligibility, gift fund requirements, community property state debt rules, non-QM parameters.'},
+      {type:'doc',   label:'Doc Agent',   action:'Generates comparison worksheets: side-by-side product comparison (conventional vs. FHA vs. portfolio), rate/payment scenarios at different loan amounts, closing cost estimates under different structures. Produces income calculation worksheets with every source cited to the specific document, page, and line item.'},
+    ],
+    hitl: 'MLO makes all structuring decisions. Agent provides data and guideline answers — MLO determines the best loan structure for the borrower. Agent never recommends a specific product; it presents options with pros/cons and the applicable guidelines.',
+    apis: ['PPE — rate scenario modeling','RAG index: FNMA Selling Guide, FHA 4000.1, VA Handbook, CU-specific overlays'],
+    compliance: ['FNMA Selling Guide B3-3 — income calculation methodology','QM/ATR Reg Z §1026.43 — DTI and fee thresholds'],
+    steps: ['I1.2', 'I2.2']
+  },
+  // ── Pipeline view ──
+  pipeline: {
+    title: 'I1.1 — Pipeline Dashboard & Lead Intelligence',
+    agents: [
+      {type:'ui',    label:'UI Agent',    action:'Presents MLO/processor pipeline dashboard: active loans by stage, alerts requiring attention (approval gates, lock expirations, overdue conditions), loan-level risk indicators (DTI elevated, appraisal risk, rate lock expiration approaching).'},
+      {type:'rag',   label:'RAG Agent',   action:'Generates daily pipeline briefing: "You have 8 active loans. 3 need attention today: James Patel\'s rate lock expires in 2 days, Amanda Foster\'s bank statements are 4 days outstanding, Emily Rodriguez\'s appraisal ETA has passed." Provides context for each flag.'},
+      {type:'workflow',label:'Workflow Agent',action:'Routes all human-in-the-loop approval requests to the correct loan officer: pre-qual letters, rate lock approvals, LE approvals, complex scenario escalations. Monitors SLA timers and escalates overdue items.'},
+    ],
+    hitl: 'Pipeline view is informational. Action items from the pipeline route to the Action List tab for processor approval. Rate lock extensions and LE approvals require MLO sign-off.',
+    apis: ['LOS (Encompass / MeridianLink / nCino) — real-time pipeline data','Push alerts: lock expiration, condition deadlines, appraisal receipt'],
+    compliance: ['TRID compliance clock monitoring — 3-day LE, 3-day CD waiting periods'],
+    steps: ['I1.1', 'I2.0']
+  }
+};
+ 
+const AGENT_COLORS = {
+  voice:    {bg:'#ede8fc', c:'#5b21b6', label:'🎙 Voice Agent'},
+  rag:      {bg:'#dff4fb', c:'#086789', label:'📚 RAG Agent'},
+  doc:      {bg:'#fce4f3', c:'#9d174d', label:'📄 Doc Agent'},
+  chat:     {bg:'#ccfbf1', c:'#0d9488', label:'💬 Chat Agent'},
+  web:      {bg:'#fef3c7', c:'#92400e', label:'🌐 Web Agent'},
+  ui:       {bg:'#e0f7fa', c:'#086789', label:'🖥 UI Agent'},
+  workflow: {bg:'#f1f5f9', c:'#475569', label:'⚙ Workflow Agent'},
+};
+ 
+let PANEL_OPEN = false;
+ 
+function getAgentKey() {
+  if (STATE.view === 'workbench') return 'wb_' + STATE.wbTab;
+  if (STATE.view === 'pipeline')  return 'pipeline';
+  return 'b' + STATE.bStep;
+}
+ 
+function buildAgentPanel() {
+  const key  = getAgentKey();
+  const data = AGENT_DATA[key] || AGENT_DATA['b0'];
+ 
+  // Toggle button
+  const toggle = document.getElementById('agent-toggle');
+  if (toggle) {
+    toggle.className = 'panel-open' in toggle.dataset ? (PANEL_OPEN ? 'panel-open' : '') : '';
+    toggle.className = PANEL_OPEN ? 'panel-open' : '';
+  }
+ 
+  // Panel
+  const panel = document.getElementById('agent-panel');
+  if (!panel) return;
+  panel.className = PANEL_OPEN ? 'open' : '';
+  panel.innerHTML = '';
+ 
+  // Head
+  const head = document.createElement('div');
+  head.id = 'agent-panel-head';
+  head.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#954892,#6161E0);display:flex;align-items:center;justify-content:center;font-size:13px">🤖</div>
+        <div style="font-weight:800;font-size:13.5px;color:#211E1F">Agentic Layer</div>
+      </div>
+      <button onclick="PANEL_OPEN=false;buildAgentPanel();" style="background:none;border:none;font-size:16px;color:#6B6870;cursor:pointer;padding:2px 5px">✕</button>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#954892;background:#f3e9f3;padding:3px 9px;border-radius:5px;display:inline-block">${data.title}</div>
+    <div style="margin-top:7px;display:flex;gap:4px;flex-wrap:wrap">
+      ${(data.steps||[]).map(s=>`<span style="font-size:10px;font-weight:700;background:#211E1F;color:#E0C6D9;padding:2px 8px;border-radius:4px">${s}</span>`).join('')}
+    </div>`;
+  panel.appendChild(head);
+ 
+  const body = document.createElement('div');
+  body.id = 'agent-panel-body';
+ 
+  // Active agents
+  const agentSection = document.createElement('div');
+  agentSection.className = 'ap-section';
+  agentSection.innerHTML = `<div class="ap-section-title">Active agents at this step</div>`;
+  const agentTags = document.createElement('div');
+  agentTags.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px';
+  data.agents.forEach(a => {
+    const ac = AGENT_COLORS[a.type] || AGENT_COLORS.workflow;
+    const tag = document.createElement('span');
+    tag.className = 'agent-tag ' + a.type;
+    tag.textContent = ac.label;
+    agentTags.appendChild(tag);
+  });
+  agentSection.appendChild(agentTags);
+  body.appendChild(agentSection);
+ 
+  // What each agent does
+  const actSection = document.createElement('div');
+  actSection.className = 'ap-section';
+  actSection.innerHTML = `<div class="ap-section-title">What each agent does here</div>`;
+  data.agents.forEach(a => {
+    const ac = AGENT_COLORS[a.type] || AGENT_COLORS.workflow;
+    const row = document.createElement('div');
+    row.className = 'action-row';
+    row.innerHTML = `
+      <div class="action-row-head" style="background:${ac.bg}">
+        <span class="agent-tag ${a.type}" style="margin:0">${ac.label}</span>
+      </div>
+      <div class="action-row-body">${a.action}</div>`;
+    actSection.appendChild(row);
+  });
+  body.appendChild(actSection);
+ 
+  // Divider
+  body.appendChild(Object.assign(document.createElement('div'), {className:'ap-divider'}));
+ 
+  // HITL gate
+  if (data.hitl) {
+    const hitlSec = document.createElement('div');
+    hitlSec.className = 'ap-section';
+    hitlSec.innerHTML = `<div class="ap-section-title">✋ Human-in-the-loop gate</div>`;
+    const hitlBox = document.createElement('div');
+    hitlBox.className = 'hitl-box';
+    hitlBox.innerHTML = `<div style="font-weight:700;font-size:11.5px;color:#15803d;margin-bottom:3px">Human oversight required:</div><div style="font-size:12px;color:#166534;line-height:1.6">${data.hitl}</div>`;
+    hitlSec.appendChild(hitlBox);
+    body.appendChild(hitlSec);
+  }
+ 
+  // APIs
+  if (data.apis && data.apis.length > 0) {
+    body.appendChild(Object.assign(document.createElement('div'), {className:'ap-divider'}));
+    const apiSec = document.createElement('div');
+    apiSec.className = 'ap-section';
+    apiSec.innerHTML = `<div class="ap-section-title">🔗 API integrations</div>
+      <div style="margin-bottom:10px">${data.apis.map(a=>`<span class="api-pill">${a}</span>`).join('')}</div>`;
+    body.appendChild(apiSec);
+  }
+ 
+  // Compliance
+  if (data.compliance && data.compliance.length > 0) {
+    const compSec = document.createElement('div');
+    compSec.className = 'ap-section';
+    compSec.innerHTML = `<div class="ap-section-title">⚖ Compliance guardrails</div>
+      <div style="margin-bottom:10px">${data.compliance.map(c=>`<span class="comp-pill">${c}</span>`).join('')}</div>`;
+    body.appendChild(compSec);
+  }
+ 
+  // Design principle footer
+  body.appendChild(Object.assign(document.createElement('div'), {className:'ap-divider'}));
+  const footer = document.createElement('div');
+  footer.className = 'ap-section';
+  footer.innerHTML = `<div style="font-size:11.5px;color:#6B6870;line-height:1.6;padding:8px 12px;background:#faf5fb;border-radius:8px;border:1px solid #E0C6D9"><strong style="color:#954892">Design principle:</strong> Agents gather, analyze, draft, and recommend — humans review, approve, and decide. No agent autonomously makes a credit decision, issues a denial, or approves a disclosure.</div>`;
+  body.appendChild(footer);
+ 
+  panel.appendChild(body);
+}
+ 
+function initAgentPanel() {
+  // Create toggle button
+  const toggle = document.createElement('button');
+  toggle.id = 'agent-toggle';
+  toggle.innerHTML = '🤖<span>AGENTS</span>';
+  toggle.addEventListener('click', () => {
+    PANEL_OPEN = !PANEL_OPEN;
+    toggle.className = PANEL_OPEN ? 'panel-open' : '';
+    buildAgentPanel();
+  });
+  document.body.appendChild(toggle);
+ 
+  // Create panel element
+  const panel = document.createElement('div');
+  panel.id = 'agent-panel';
+  document.body.appendChild(panel);
+ 
+  buildAgentPanel();
+}
+ 
+// ── Patch render() to also update agent panel ──
+const _origRender = render;
+render = function() {
+  _origRender();
+  if (document.getElementById('agent-panel')) buildAgentPanel();
+};
+ 
+initAgentPanel();
+</script>
+</body>
+</html>
